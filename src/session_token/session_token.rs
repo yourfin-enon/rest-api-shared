@@ -5,11 +5,11 @@ use super::TokenKey;
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SessionToken {
     #[prost(string, tag = "1")]
-    user_id: ::prost::alloc::string::String,
+    pub user_id: ::prost::alloc::string::String,
     #[prost(int64, tag = "2")]
-    expires: i64,
+    pub expires: i64,
     #[prost(string, tag = "3")]
-    ip: ::prost::alloc::string::String,
+    pub ip: ::prost::alloc::string::String,
 }
 
 impl SessionToken {
