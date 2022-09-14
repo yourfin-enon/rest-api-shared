@@ -8,8 +8,8 @@ impl TokenKey {
     }
 
     pub fn from_string_token(token_key: &str) -> Self {
-        if token_key.len() != 32 {
-            panic!("TOKEN_KEY is not 32 characters long");
+        if token_key.len() != 36 {
+            panic!("TOKEN_KEY is not 36 characters long");
         }
         Self {
             key: token_key.to_string(),
