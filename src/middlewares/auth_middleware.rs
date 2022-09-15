@@ -84,9 +84,9 @@ impl HttpServerMiddleware for AuthMiddleware {
 
         match ctx.request.get_headers().get(AUTH_HEADER) {
             Some(header) => {
-                if let Some(session_token) = SessionToken::parse_from_token(
+                if let Some(session_token) = SessionToken::new_from_string(
                     std::str::from_utf8(header.as_bytes()).unwrap(),
-                    &self.token_key,
+                    &self.token_key.key,
                 ) {
                     let now = DateTimeAsMicroseconds::now();
 

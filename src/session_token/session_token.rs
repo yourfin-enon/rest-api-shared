@@ -1,62 +1,53 @@
+use libaes::Cipher;
 use rust_extensions::date_time::DateTimeAsMicroseconds;
-
-use super::TokenKey;
+use sha2::{Digest, Sha512};
 
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SessionToken {
     #[prost(string, tag = "1")]
-    pub user_id: ::prost::alloc::string::String,
-    #[prost(int64, tag = "2")]
-    pub expires: i64,
-    #[prost(string, tag = "3")]
-    pub ip: ::prost::alloc::string::String,
+    pub id: ::prost::alloc::string::String,
+
+    #[prost(string, tag = "13")]
+    pub brand_id: ::prost::alloc::string::String,
+
+    #[prost(string, tag = "14")]
+    pub ip: ::prost::alloc::string::String,    
 }
 
 impl SessionToken {
-    pub fn new(user_id: String, expires: DateTimeAsMicroseconds, ip: String) -> Self {
-        SessionToken {
-            user_id,
-            expires: expires.unix_microseconds,
-            ip,
-        }
-    }
-
     pub fn get_user_id(&self) -> &str {
-        &self.user_id
+        &self.id
     }
 
     pub fn receive_user_id(self) -> String {
-        self.user_id
+        self.id
     }
 
     pub fn get_expires_microseconds(&self) -> i64 {
-        self.expires
+        DateTimeAsMicroseconds::now().unix_microseconds + 1000 * 60 *60
     }
 
-    pub fn into_token(&self, token_key: &TokenKey) -> String {
-        let mut token_payload = Vec::new();
-        prost::Message::encode(self, &mut token_payload).unwrap();
+    pub fn new_from_string(token_as_str: &str, key: &str) -> Option<SessionToken> {
+        let decoded_token = base64::decode(token_as_str);
 
-        let ciphertext = enc_file::encrypt_aes(token_payload, token_key.key.as_str()).unwrap();
-
-        base64::encode(ciphertext)
-    }
-
-    pub fn parse_from_token(token_as_str: &str, token_key: &TokenKey) -> Option<SessionToken> {
-        let encoded_token = base64::decode(token_as_str);
-
-        if encoded_token.is_err() {
+        if decoded_token.is_err() {
             return None;
         }
 
-        let result = enc_file::decrypt_aes(encoded_token.unwrap(), token_key.key.as_str());
+        let decoded_token = decoded_token.unwrap();   
+        let mut iv: [u8; 16] = [0; 16];
+        iv.copy_from_slice(&decoded_token[..16]);
 
-        if result.is_err() {
-            return None;
-        }
+        let mut hasher = Sha512::new();
+        hasher.update(key);
+        let key_hash = hasher.finalize();
+        let mut aes_key = [0; 24];
+        aes_key.copy_from_slice(&key_hash[..24]);
 
-        let result: Result<SessionToken, prost::DecodeError> =
-            prost::Message::decode(result.unwrap().as_slice());
+        let cipher = Cipher::new_192(&aes_key);
+        let decrypted = cipher.cbc_decrypt(&iv, &decoded_token[16..128]);
+
+        let result: Result<SessionToken, prost::DecodeError> = prost::Message::decode(&decrypted[..]);
 
         if result.is_err() {
             return None;
@@ -68,26 +59,17 @@ impl SessionToken {
 
 #[cfg(test)]
 mod test {
+    use crate::session_token::SessionToken;
 
     #[test]
-    fn test_encrypt_decrypt() {
-        use super::*;
-        use crate::session_token::TokenKey;
+    fn test_decrypt() {
+        let my_key = "e537d941-f7d2-4939-b97b-ae4722ca56aa";
+        let token_as_str = "mFKXtvMOmCaV/JTeGpyq+C6AB83s6/HtsQfowZGMX+M0TfgXrzspR3exyYNGRkILe9T5rpgZLlWUWUF4vFc/XxIPGWEd7KPaiXlUcpAWOJ8TVrP4z0KkgOjjuH1TUBopQJ0LtQeiG906ZIcvkTrNP198ypq+EAvA8jVoKWaeonc=";
+        
+        let token = SessionToken::new_from_string(token_as_str, my_key).unwrap();
 
-        let token_key = TokenKey::from_string_token("an exampaaaaaaaaaaaaaaaaaaaaaaaa");
-
-        let session_token = SessionToken::new(
-            "user_id".to_string(),
-            DateTimeAsMicroseconds::now(),
-            "127.0.0.1".to_string(),
-        );
-
-        let token_as_str = session_token.into_token(&token_key);
-
-        let session_token_from_token = SessionToken::parse_from_token(&token_as_str, &token_key);
-
-        print!("{:?}", session_token_from_token);
-
-        assert_eq!(session_token, session_token_from_token.unwrap());
+        assert_eq!("9674f28758644015930dd836e43bacef", token.get_user_id());
+        assert_eq!("Monfex", token.brand_id);
+        assert_eq!("176.52.29.155", token.ip);
     }
 }
