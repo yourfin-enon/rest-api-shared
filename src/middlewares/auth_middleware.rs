@@ -96,7 +96,7 @@ impl HttpServerMiddleware for AuthMiddleware {
                             "Token is expired".to_string().into(),
                         ));
                     }
-                    let brand_id_user_id = session_token.receive_brand_id_user_Id();
+                    let brand_id_user_id = session_token.receive_brand_id_user_id();
 
                     ctx.request.set_key_value(
                         KV_USER_ID.to_string(),
