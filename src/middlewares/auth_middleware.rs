@@ -100,12 +100,12 @@ impl HttpServerMiddleware for AuthMiddleware {
 
                     ctx.request.set_key_value(
                         KV_USER_ID.to_string(),
-                        brand_id_user_id.0.into_bytes(),
+                        brand_id_user_id.1.into_bytes(),
                     );
 
                     ctx.request.set_key_value(
                         KV_BRAND_ID.to_string(),
-                        brand_id_user_id.1.into_bytes(),
+                        brand_id_user_id.0.into_bytes(),
                     );
 
                     return get_next.next(ctx).await;
