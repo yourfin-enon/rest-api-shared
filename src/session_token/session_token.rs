@@ -31,7 +31,7 @@ impl SessionToken {
         self.brand_id
     }
 
-    pub fn receive_brand_id_user_Id(self) -> (String, String) {
+    pub fn receive_brand_id_user_id(self) -> (String, String) {
         (self.brand_id, self.id)
     }
 
