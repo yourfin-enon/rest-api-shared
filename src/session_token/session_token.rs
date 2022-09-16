@@ -27,6 +27,14 @@ impl SessionToken {
         self.id
     }
 
+    pub fn receive_brand_id(self) -> String {
+        self.brand_id
+    }
+
+    pub fn receive_brand_id_user_Id(self) -> (String, String) {
+        (self.brand_id, self.id)
+    }
+
     pub fn get_expires_microseconds(&self) -> i64 {
         let expires_ts = self.expires.as_ref().unwrap();
 
