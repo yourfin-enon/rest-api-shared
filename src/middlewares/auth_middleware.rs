@@ -15,6 +15,7 @@ pub struct AuthMiddleware {
     token_key: TokenKey,
     ignore_full_paths: Option<HashMap<String, String>>,
     ignore_start_path: Option<Vec<String>>,
+    ignore_contains_paths: Option<Vec<String>>,
 }
 
 impl AuthMiddleware {
@@ -23,12 +24,13 @@ impl AuthMiddleware {
             token_key,
             ignore_full_paths: None,
             ignore_start_path: None,
+            ignore_contains_paths: None,
         }
     }
 
     pub fn new_with_default_paths_to_ignore(token_key: TokenKey) -> Self {
         let mut result = Self::new(token_key);
-        result.add_start_path_to_ignore("/swagger");
+        result.add_contains_path_to_ignore("swagger");
         result
     }
 
@@ -40,6 +42,14 @@ impl AuthMiddleware {
         if let Some(ref items) = self.ignore_start_path {
             for item in items {
                 if path.starts_with(item) {
+                    return true;
+                }
+            }
+        }
+
+        if let Some(ref items) = self.ignore_contains_paths {
+            for item in items {
+                if path.contains(item) {
                     return true;
                 }
             }
@@ -65,6 +75,17 @@ impl AuthMiddleware {
         }
 
         self.ignore_start_path
+            .as_mut()
+            .unwrap()
+            .push(path.to_string());
+    }
+
+    pub fn add_contains_path_to_ignore(&mut self, path: &str) {
+        if self.ignore_contains_paths.is_none() {
+            self.ignore_contains_paths = Some(Vec::new());
+        }
+
+        self.ignore_contains_paths
             .as_mut()
             .unwrap()
             .push(path.to_string());
