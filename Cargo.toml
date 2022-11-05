@@ -1,15 +1,15 @@
 [package]
 name = "rest-api-shared"
-version = "0.1.0"
+version = "0.3.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 rust-extensions = { tag = "0.1.2", git = "https://github.com/MyJetTools/rust-extensions.git" }
-my-http-server-controllers = { tag = "0.2.7", git = "https://github.com/MyJetTools/my-http-server-controllers.git" }
-my-http-server-swagger = { tag = "0.2.7", git = "https://github.com/MyJetTools/my-http-server-swagger.git" }
-my-http-server = { tag = "0.2.7", git = "https://github.com/MyJetTools/my-http-server.git" }
+my-http-server-controllers = { tag = "0.3.1", git = "https://github.com/MyJetTools/my-http-server-controllers.git" }
+my-http-server-swagger = { tag = "0.3.1", git = "https://github.com/MyJetTools/my-http-server-swagger.git" }
+my-http-server = { tag = "0.3.0", git = "https://github.com/MyJetTools/my-http-server.git" }
 
 async-trait = "*"
 tonic = { version = "*", features = ["tls", "tls-roots", "prost"] }
@@ -26,7 +26,7 @@ enc_file = "*"
 base64 = "*"
 serde_repr = "*"
 serde_json = "*"
-aes = "0.8.1"
-libaes = "0.6.4"
+aes = "*"
+libaes = "*"
 sha2 = "*"
-isolang = "2.1.0"
+isolang = "*"
