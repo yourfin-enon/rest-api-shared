@@ -1,4 +1,5 @@
 use libaes::Cipher;
+use my_http_server::{RequestClaim, RequestCredentials};
 use sha2::{Digest, Sha512};
 
 use super::DateTime;
@@ -16,6 +17,16 @@ pub struct SessionToken {
 
     #[prost(string, tag = "14")]
     pub ip: ::prost::alloc::string::String,
+}
+
+impl RequestCredentials for SessionToken {
+    fn get_id(&self) -> &str {
+        &self.id
+    }
+
+    fn get_claims(&self) -> Option<Vec<RequestClaim>> {
+        None
+    }
 }
 
 impl SessionToken {

@@ -7,8 +7,6 @@ use rust_extensions::date_time::DateTimeAsMicroseconds;
 use crate::session_token::{SessionToken, TokenKey};
 
 const AUTH_HEADER: &str = "authorization";
-pub const KV_USER_ID: &str = "USER_ID";
-pub const KV_BRAND_ID: &str = "BRAND_ID";
 
 pub struct AuthMiddleware {
     token_key: TokenKey,
@@ -88,7 +86,7 @@ impl HttpServerMiddleware for AuthMiddleware {
         match ctx.request.get_headers().get(AUTH_HEADER) {
             Some(header) => {
                 if let Some(session_token) = SessionToken::new_from_string(
-                    std::str::from_utf8(header.as_bytes()).unwrap(),
+                    std::str::from_utf8(extract_token(header.as_bytes())).unwrap(),
                     &self.token_key.key,
                 ) {
                     let now = DateTimeAsMicroseconds::now();
@@ -98,14 +96,8 @@ impl HttpServerMiddleware for AuthMiddleware {
                             "Token is expired".to_string().into(),
                         ));
                     }
-                    let brand_id_user_id = session_token.receive_brand_id_user_id();
 
-                    ctx.request
-                        .set_key_value(KV_USER_ID.to_string(), brand_id_user_id.1.into_bytes());
-
-                    ctx.request
-                        .set_key_value(KV_BRAND_ID.to_string(), brand_id_user_id.0.into_bytes());
-
+                    ctx.credentials = Some(Box::new(session_token));
                     return get_next.next(ctx).await;
                 } else {
                     return Err(HttpFailResult::as_unauthorized(
@@ -119,5 +111,31 @@ impl HttpServerMiddleware for AuthMiddleware {
                 ));
             }
         }
+    }
+}
+
+fn extract_token(src: &[u8]) -> &[u8] {
+    if src[6] == b' ' {
+        return &src[7..];
+    }
+    src
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::middlewares::auth_middleware::extract_token;
+
+    #[test]
+    fn test_extract_token() {
+        let src = b"Bearer 1234567890";
+        let result = extract_token(src);
+        assert_eq!(result, b"1234567890");
+    }
+
+    #[test]
+    fn test_extract_token_without_bearer() {
+        let src = b"1234567890";
+        let result = extract_token(src);
+        assert_eq!(result, b"1234567890");
     }
 }
