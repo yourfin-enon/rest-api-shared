@@ -7,17 +7,41 @@ pub enum ResultStatus {
     #[http_enum_case(id="0"; description="Operations was successful")]
     Ok,
 
-    #[http_enum_case(id="-1"; description="User already Exists")]
-    UserAlreadyExists = -1,
+    #[http_enum_case(id="-1"; description="Invalid username or password")]
+    InvalidUserNameOrPassword = -1,
 
-    #[http_enum_case(id="-2"; description="Invalid Username or Password")]
-    InvalidUserNameOrPassword = -2,
+    #[http_enum_case(id="-2"; description="User exists")]
+    UserExists = -2,
 
-    #[http_enum_case(id="-3"; description="Invalid token")]
-    InvalidToken = -3,
+    #[http_enum_case(id="-3"; description="User not found")]
+    UserNotFound = -3,
 
-    #[http_enum_case(id="-4"; description="Token is expired")]
-    TokenIsExpired = -4,
+    #[http_enum_case(id="-4"; description="Old password is wrong")]
+    OldPasswordIsWrong = -4,
+
+    #[http_enum_case(id="-5"; description="Wrong file extension")]
+    WrongFileExtension = -5,
+
+    #[http_enum_case(id="-6"; description="File not found")]
+    FileNotFound = -6,
+
+    #[http_enum_case(id="-7"; description="Personal data is not valid")]
+    PersonalDataNotValid = -7,
+
+    #[http_enum_case(id="-8"; description="System error")]
+    SystemError = -8,
+
+    #[http_enum_case(id="-9"; description="Expired")]
+    Expired = -9,
+
+    #[http_enum_case(id="-10"; description="TechnicalError")]
+    TechnicalError = -10,
+
+    #[http_enum_case(id="-11"; description="CountryRestriction")]
+    CountryIsRestricted = -11,
+
+    #[http_enum_case(id="-999"; description="Force Update required")]
+    ForceUpdateIsRequired = -999,
 }
 
 #[cfg(test)]
@@ -32,7 +56,7 @@ mod test {
     #[test]
     pub fn test_reult_deserialization() {
         let test_struct = TestStruct {
-            result: ResultStatus::TokenIsExpired,
+            result: ResultStatus::Expired,
         };
 
         let result = serde_json::to_string(&test_struct).unwrap();
