@@ -1,5 +1,5 @@
 use libaes::Cipher;
-use my_http_server::{RequestClaim, RequestCredentials};
+use my_http_server::{RequestCredentials, RequestClaim};
 use sha2::{Digest, Sha512};
 
 use super::DateTime;
@@ -30,20 +30,16 @@ impl RequestCredentials for SessionToken {
 }
 
 impl SessionToken {
+    pub fn get_brand_id(&self) -> &str {
+        &self.brand_id
+    }
+
     pub fn get_user_id(&self) -> &str {
         &self.id
     }
 
     pub fn receive_user_id(self) -> String {
         self.id
-    }
-
-    pub fn receive_brand_id(self) -> String {
-        self.brand_id
-    }
-
-    pub fn receive_brand_id_user_id(self) -> (String, String) {
-        (self.brand_id, self.id)
     }
 
     pub fn get_expires_microseconds(&self) -> i64 {
