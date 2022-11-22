@@ -133,15 +133,15 @@ mod tests {
 
     #[test]
     fn test_extract_token() {
-        let src = b"Bearer 1234567890";
+        let src = b"Bearer cCmSsx4q25RjB1kaggNu2/NhFsUxakLqjHE0tdpwmnySfceBKV8m86I7DRp5lf0yxln/W7Tqb0v29uRMDzWBdgLAdrR4IqmzD6lXLG5JwoNZKGlXRFvpyb7eg1UDFc7hg4+P0T7ijdYSX1XhbsR4x679R14yYZu/nN9foTempW0=";
         let result = extract_token(src);
-        assert_eq!(result, b"1234567890");
+        assert_eq!(result, b"cCmSsx4q25RjB1kaggNu2/NhFsUxakLqjHE0tdpwmnySfceBKV8m86I7DRp5lf0yxln/W7Tqb0v29uRMDzWBdgLAdrR4IqmzD6lXLG5JwoNZKGlXRFvpyb7eg1UDFc7hg4+P0T7ijdYSX1XhbsR4x679R14yYZu/nN9foTempW0=");
     }
 
     #[test]
     fn test_extract_token_without_bearer() {
-        let src = b"1234567890";
+        let src = b"cCmSsx4q25RjB1kaggNu2/NhFsUxakLqjHE0tdpwmnySfceBKV8m86I7DRp5lf0yxln/W7Tqb0v29uRMDzWBdgLAdrR4IqmzD6lXLG5JwoNZKGlXRFvpyb7eg1UDFc7hg4+P0T7ijdYSX1XhbsR4x679R14yYZu/nN9foTempW0=";
         let result = extract_token(src);
-        assert_eq!(result, b"1234567890");
+        assert_eq!(result, b"cCmSsx4q25RjB1kaggNu2/NhFsUxakLqjHE0tdpwmnySfceBKV8m86I7DRp5lf0yxln/W7Tqb0v29uRMDzWBdgLAdrR4IqmzD6lXLG5JwoNZKGlXRFvpyb7eg1UDFc7hg4+P0T7ijdYSX1XhbsR4x679R14yYZu/nN9foTempW0=");
     }
 }
