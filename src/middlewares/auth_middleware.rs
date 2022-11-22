@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use my_http_server::{
     HttpContext, HttpFailResult, HttpOkResult, HttpPath, HttpServerMiddleware,
     HttpServerRequestFlow,
@@ -17,13 +19,13 @@ pub struct AuthMiddleware {
     token_key: TokenKey,
     ignore_full_paths: Option<Vec<HttpPath>>,
     ignore_start_path: Option<Vec<HttpPath>>,
-    sessions_reader: MyNoSqlDataReader<ClientSessionNosql>,
+    sessions_reader: Arc<MyNoSqlDataReader<ClientSessionNosql>>,
 }
 
 impl AuthMiddleware {
     pub fn new(
         token_key: TokenKey,
-        sessions_reader: MyNoSqlDataReader<ClientSessionNosql>,
+        sessions_reader: Arc<MyNoSqlDataReader<ClientSessionNosql>>,
     ) -> Self {
         Self {
             token_key,
@@ -35,7 +37,7 @@ impl AuthMiddleware {
 
     pub fn new_with_default_paths_to_ignore(
         token_key: TokenKey,
-        sessions_reader: MyNoSqlDataReader<ClientSessionNosql>,
+        sessions_reader: Arc<MyNoSqlDataReader<ClientSessionNosql>>,
     ) -> Self {
         let mut result = Self::new(token_key, sessions_reader);
         result.add_start_path_to_ignore("/swagger");
