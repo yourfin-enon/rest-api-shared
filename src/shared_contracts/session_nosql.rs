@@ -27,11 +27,11 @@ pub struct ClientSessionNosql {
 
 impl MyNoSqlEntity for ClientSessionNosql {
     fn get_partition_key(&self) -> &str {
-        &self.trader_id
+        &self.partition_key
     }
 
     fn get_row_key(&self) -> &str {
-        "*"
+        &self.row_key
     }
 
     fn get_time_stamp(&self) -> i64 {
