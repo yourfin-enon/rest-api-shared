@@ -2,9 +2,13 @@ use my_http_server::{
     HttpContext, HttpFailResult, HttpOkResult, HttpPath, HttpServerMiddleware,
     HttpServerRequestFlow,
 };
+use my_no_sql_tcp_reader::MyNoSqlDataReader;
 use rust_extensions::date_time::DateTimeAsMicroseconds;
 
-use crate::session_token::{SessionToken, TokenKey};
+use crate::{
+    session_token::{SessionToken, TokenKey},
+    shared_contracts::ClientSessionNosql,
+};
 
 const AUTH_HEADER: &str = "authorization";
 pub const KV_BRAND_ID: &str = "BRAND_ID";
@@ -13,19 +17,27 @@ pub struct AuthMiddleware {
     token_key: TokenKey,
     ignore_full_paths: Option<Vec<HttpPath>>,
     ignore_start_path: Option<Vec<HttpPath>>,
+    sessions_reader: MyNoSqlDataReader<ClientSessionNosql>,
 }
 
 impl AuthMiddleware {
-    pub fn new(token_key: TokenKey) -> Self {
+    pub fn new(
+        token_key: TokenKey,
+        sessions_reader: MyNoSqlDataReader<ClientSessionNosql>,
+    ) -> Self {
         Self {
             token_key,
             ignore_full_paths: None,
             ignore_start_path: None,
+            sessions_reader,
         }
     }
 
-    pub fn new_with_default_paths_to_ignore(token_key: TokenKey) -> Self {
-        let mut result = Self::new(token_key);
+    pub fn new_with_default_paths_to_ignore(
+        token_key: TokenKey,
+        sessions_reader: MyNoSqlDataReader<ClientSessionNosql>,
+    ) -> Self {
+        let mut result = Self::new(token_key, sessions_reader);
         result.add_start_path_to_ignore("/swagger");
         result
     }
@@ -90,6 +102,16 @@ impl HttpServerMiddleware for AuthMiddleware {
                     std::str::from_utf8(extract_token(header.as_bytes())).unwrap(),
                     &self.token_key.key,
                 ) {
+                    let pk = ClientSessionNosql::get_partition_key(session_token.get_user_id());
+                    let rk = ClientSessionNosql::get_partition_key(&session_token.id);
+                    let session = self.sessions_reader.get_entity(pk, &rk).await;
+
+                    if session.is_none() {
+                        return Err(HttpFailResult::as_unauthorized(
+                            "Session not found".to_string().into(),
+                        ));
+                    }
+
                     let now = DateTimeAsMicroseconds::now();
 
                     if now.unix_microseconds >= session_token.get_expires_microseconds() {
@@ -97,7 +119,7 @@ impl HttpServerMiddleware for AuthMiddleware {
                             "Token is expired".to_string().into(),
                         ));
                     }
-                    
+
                     let brand_id = session_token.get_brand_id().to_string();
                     ctx.request
                         .set_key_value(KV_BRAND_ID.to_string(), brand_id.into_bytes());
