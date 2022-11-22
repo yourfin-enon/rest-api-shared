@@ -16,13 +16,13 @@ pub struct ClientSessionNosql {
     #[serde(rename = "CreatedTs")]
     pub created_ts: i64,
     #[serde(rename = "DeviceUuid")]
-    pub device_uuid: String,
+    pub device_uuid: Option<String>,
     #[serde(rename = "UserAgent")]
-    pub user_agent: String,
+    pub user_agent: Option<String>,
     #[serde(rename = "Ip")]
-    pub ip: String,
+    pub ip: Option<String>,
     #[serde(rename = "IpCountry")]
-    pub ip_country: String,
+    pub ip_country: Option<String>,
 }
 
 impl MyNoSqlEntity for ClientSessionNosql {
