@@ -105,7 +105,7 @@ impl HttpServerMiddleware for AuthMiddleware {
                     &self.token_key.key,
                 ) {
                     let pk = ClientSessionNosql::get_partition_key(session_token.get_user_id());
-                    let rk = ClientSessionNosql::get_partition_key(&session_token.id);
+                    let rk = ClientSessionNosql::get_row_key(&session_token.id);
                     let session = self.sessions_reader.get_entity(pk, &rk).await;
 
                     if session.is_none() {
