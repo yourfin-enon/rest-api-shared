@@ -1,27 +1,32 @@
+use chrono::{TimeZone, Utc};
 use libaes::Cipher;
-use my_http_server::{RequestCredentials, RequestClaim};
+use my_http_server::{RequestClaim, RequestCredentials};
 use sha2::{Digest, Sha512};
-
-use super::DateTime;
 
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SessionToken {
     #[prost(string, tag = "1")]
     pub id: ::prost::alloc::string::String,
 
-    #[prost(message, tag = "2")]
-    pub expires: ::core::option::Option<DateTime>,
+    #[prost(string, tag = "2")]
+    pub trader_id: ::prost::alloc::string::String,
 
-    #[prost(string, tag = "13")]
+    #[prost(int64, tag = "3")]
+    pub expires_ts: i64,
+
+    #[prost(string, tag = "4")]
+    pub session_id: ::prost::alloc::string::String,
+
+    #[prost(string, tag = "5")]
     pub brand_id: ::prost::alloc::string::String,
 
-    #[prost(string, tag = "14")]
+    #[prost(string, tag = "6")]
     pub ip: ::prost::alloc::string::String,
 }
 
 impl RequestCredentials for SessionToken {
     fn get_id(&self) -> &str {
-        &self.id
+        &self.trader_id
     }
 
     fn get_claims(&self) -> Option<Vec<RequestClaim>> {
@@ -35,17 +40,21 @@ impl SessionToken {
     }
 
     pub fn get_user_id(&self) -> &str {
-        &self.id
+        &self.trader_id
     }
 
     pub fn receive_user_id(self) -> String {
-        self.id
+        self.trader_id
     }
 
     pub fn get_expires_microseconds(&self) -> i64 {
-        let expires_ts = self.expires.as_ref().unwrap();
+        let expires = Utc.timestamp_millis_opt(self.expires_ts).single();
 
-        expires_ts.timestamp_micros()
+        if let Some(expires) = expires {
+            return expires.timestamp_millis();
+        } else {
+            return 0;
+        }
     }
 
     pub fn new_from_string(token_as_str: &str, key: &str) -> Option<SessionToken> {
@@ -89,6 +98,7 @@ mod test {
         let token_as_str = "Xxaj4GpdmCkR4FoqiYE3VkW2xa+8IJyMLC/tukksCzzNC5WRMJpcyoFk7FnNZIy5v8UsOOBpDX27ipZIM3yI7BBQ5KSFvyYMOhfJzyDomPm3P4T1sFttk8+Ro7KE+zMvksuOMtp64iafXqf5FT8jcuRA1RQjvDu3tb6fM/vPRS8=";
 
         let token = SessionToken::new_from_string(token_as_str, my_key).unwrap();
+        println!("{}", token.session_id);
 
         assert_eq!("9674f28758644015930dd836e43bacef", token.get_user_id());
         assert_eq!("Monfex", token.brand_id);
