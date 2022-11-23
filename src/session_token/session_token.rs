@@ -51,7 +51,7 @@ impl SessionToken {
         let expires = Utc.timestamp_millis_opt(self.expires_ts).single();
 
         if let Some(expires) = expires {
-            return expires.timestamp_millis();
+            return expires.timestamp_micros();
         } else {
             return 0;
         }
