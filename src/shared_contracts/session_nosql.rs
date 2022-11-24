@@ -16,7 +16,7 @@ pub struct ClientSessionNosql {
     #[serde(rename = "CreatedTs")]
     pub created_ts: i64,
     #[serde(rename = "DeviceUuid")]
-    pub device_uuid: Option<String>,
+    pub device: Option<String>,
     #[serde(rename = "UserAgent")]
     pub user_agent: Option<String>,
     #[serde(rename = "Ip")]
