@@ -24,7 +24,7 @@ pub struct ClientSessionNosql {
     pub ip: Option<String>,
     #[serde(rename = "IpCountry")]
     pub ip_country: Option<String>,
-    #[serde(rename = "Expires")]
+    #[serde(rename = "ExpiresTs")]
     pub expires_ts: i64,
 }
 
