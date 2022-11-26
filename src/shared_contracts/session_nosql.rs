@@ -84,7 +84,7 @@ impl MyNoSqlEntity for LiteClientSessionNosql {
 
 impl LiteClientSessionNosql {
     pub fn get_table_name() -> String {
-        String::from("client-sessions")
+        String::from("client-sessions-lite")
     }
 
     pub fn get_partition_key(trader_id: &str) -> &str {
