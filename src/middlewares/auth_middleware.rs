@@ -9,7 +9,7 @@ use rust_extensions::date_time::DateTimeAsMicroseconds;
 
 use crate::{
     session_token::{SessionToken, TokenKey},
-    shared_contracts::{ClientSessionNosql, ClientSessionLiteNosql},
+    shared_contracts::{ClientSessionNosql, LiteClientSessionNosql},
 };
 
 const AUTH_HEADER: &str = "authorization";
@@ -19,13 +19,13 @@ pub struct AuthMiddleware {
     token_key: TokenKey,
     ignore_full_paths: Option<Vec<HttpPath>>,
     ignore_start_path: Option<Vec<HttpPath>>,
-    sessions_reader: Arc<MyNoSqlDataReader<ClientSessionLiteNosql>>,
+    sessions_reader: Arc<MyNoSqlDataReader<LiteClientSessionNosql>>,
 }
 
 impl AuthMiddleware {
     pub fn new(
         token_key: TokenKey,
-        sessions_reader: Arc<MyNoSqlDataReader<ClientSessionLiteNosql>>,
+        sessions_reader: Arc<MyNoSqlDataReader<LiteClientSessionNosql>>,
     ) -> Self {
         Self {
             token_key,
@@ -37,7 +37,7 @@ impl AuthMiddleware {
 
     pub fn new_with_default_paths_to_ignore(
         token_key: TokenKey,
-        sessions_reader: Arc<MyNoSqlDataReader<ClientSessionLiteNosql>>,
+        sessions_reader: Arc<MyNoSqlDataReader<LiteClientSessionNosql>>,
     ) -> Self {
         let mut result = Self::new(token_key, sessions_reader);
         result.add_start_path_to_ignore("/swagger");

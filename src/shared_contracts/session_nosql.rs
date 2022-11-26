@@ -57,7 +57,7 @@ impl ClientSessionNosql {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ClientSessionLiteNosql {
+pub struct LiteClientSessionNosql {
     #[serde(rename = "PartitionKey")]
     pub partition_key: String,
     #[serde(rename = "RowKey")]
@@ -68,7 +68,7 @@ pub struct ClientSessionLiteNosql {
     pub trader_id: String,
 }
 
-impl MyNoSqlEntity for ClientSessionLiteNosql {
+impl MyNoSqlEntity for LiteClientSessionNosql {
     fn get_partition_key(&self) -> &str {
         &self.partition_key
     }
@@ -82,7 +82,7 @@ impl MyNoSqlEntity for ClientSessionLiteNosql {
     }
 }
 
-impl ClientSessionLiteNosql {
+impl LiteClientSessionNosql {
     pub fn get_table_name() -> String {
         String::from("client-sessions")
     }
