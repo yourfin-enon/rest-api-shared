@@ -34,8 +34,8 @@ pub struct AccessClaim {
     pub id: ::prost::alloc::string::String,
     #[prost(int64, tag = "2")]
     pub expires: i64,
-    #[prost(message, repeated, tag = "3")]
-    pub allowed_ips: ::prost::alloc::vec::Vec<String>,
+    //#[prost(message, repeated, tag = "3")]
+    //pub allowed_ips: ::prost::alloc::vec::Vec<String>,
 }
 
 impl RequestCredentials for AccessToken {
@@ -54,7 +54,7 @@ impl RequestCredentials for AccessToken {
                 let expires = DateTimeAsMicroseconds::new(Utc.timestamp_millis_opt(c.expires).single().unwrap_or_default().timestamp_micros());
 
                 RequestClaim {
-                    allowed_ips: Some(&c.allowed_ips),
+                    allowed_ips: None,
                     expires,
                     id: &c.id
                 }})
@@ -130,9 +130,13 @@ mod test {
     fn test_decrypt() {
         let my_key = "e537d941-f7d2-4939-b97b-ae4722ca56aa";
         let token_as_str = 
-        "Uu9npuPp5UzxttQAqIMonFSlAdGsZ5+9hYj182/or+JxZcTXVYvCNMATCQ3nQ0EdKbmzIiaSHGxQd28iDIzsOkXCIOSoB7hJTE/e2Fd3neXQRFv5QJAOE0HUFVvTX0DtztEdg1lp+KkjT+gJWFgajMJ4fCklD3dTZy1Z7b+l6GsWObnsHiUXlqLcBb6bYxov88THfrXqASA+xdHSHgjBdQAEX8L2rvi5PJWZmTkFoE8=";
+"2KaGFpk+Maqg6Qdh2Axd9o5xyA6obs0gvKDteB/IHzhFk5rQWAAztfsPoqdausKyblkZLOecQphjm83gxJBZ0oyrY82yRsdTpUBZfagozqbM4RMmMfFoMw4Kc6BrDajeXEIJFhyVpq1qiO6MbauKJnOPtM/mNvIsTZ7WDgSpDLx2dkDheWkbKxOAEhOwa5GxdAlS+cQQyiEXSVEngnEciKTnl5w/9gx5b8UC+IBb3P9obSTOhj6uqRbkHuQ7fmdm";
         let token = AccessToken::new_from_string(token_as_str, my_key).unwrap();
         println!("{:#?}", token);
+        let creds: Box::<dyn RequestCredentials> = Box::new(token.clone());
+        let creds_claims = creds.get_claims().unwrap();
+        let claim_ids: Vec<String> = creds_claims.iter().map(|v| {v.id.to_string()}).collect();
+        println!("{:#?}", claim_ids);
 
         assert_eq!("0985e284b3b148798f93d29ccb208a49", token.trader_id);
         assert_eq!("Monfex", token.brand_id);
@@ -146,7 +150,7 @@ mod test {
     fn test_get_claims() {
         let token = AccessToken {
             claims: vec![AccessClaim {
-                allowed_ips: vec!["1".to_string(), "2".to_string()],
+                //allowed_ips: vec!["1".to_string(), "2".to_string()],
                 expires: Utc::now().timestamp_millis(),
                 id: "Test".to_string()
             }],
