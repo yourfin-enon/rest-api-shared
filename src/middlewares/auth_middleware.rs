@@ -9,7 +9,10 @@ use rust_extensions::date_time::DateTimeAsMicroseconds;
 
 use crate::{
     session_token::{SessionToken, TokenKey},
-    shared_contracts::{ClientSessionNosql, LiteClientSessionNosql},
+    shared_contracts::{
+        auth_failed::AuthenticationFailedApiResponse, ApiResultStatus, ClientSessionNosql,
+        LiteClientSessionNosql,
+    },
 };
 
 const AUTH_HEADER: &str = "authorization";
@@ -109,16 +112,18 @@ impl HttpServerMiddleware for AuthMiddleware {
                     let session = self.sessions_reader.get_entity(pk, &rk).await;
 
                     if session.is_none() {
-                        return Err(HttpFailResult::as_unauthorized(
-                            "Session not found".to_string().into(),
+                        return Err(AuthenticationFailedApiResponse::new(
+                            ApiResultStatus::AccessTokenInvalid,
+                            "Session not found".to_string(),
                         ));
                     }
 
                     let now = DateTimeAsMicroseconds::now();
 
                     if now.unix_microseconds >= session_token.get_expires_microseconds() {
-                        return Err(HttpFailResult::as_unauthorized(
-                            "Token is expired".to_string().into(),
+                        return Err(AuthenticationFailedApiResponse::new(
+                            ApiResultStatus::AccessTokenExpired,
+                            "AccessToken expired".to_string(),
                         ));
                     }
 
@@ -130,14 +135,16 @@ impl HttpServerMiddleware for AuthMiddleware {
 
                     return get_next.next(ctx).await;
                 } else {
-                    return Err(HttpFailResult::as_unauthorized(
-                        "Invalid token".to_string().into(),
-                    ));
+                    return Err(AuthenticationFailedApiResponse::new(
+                        ApiResultStatus::AccessTokenInvalid,
+                        "AccessToken invalid".to_string(),
+                    ));                    
                 }
             }
             None => {
-                return Err(HttpFailResult::as_unauthorized(
-                    "Token is missing".to_string().into(),
+                return Err(AuthenticationFailedApiResponse::new(
+                    ApiResultStatus::AccessTokenInvalid,
+                    "AccessToken not found".to_string(),
                 ));
             }
         }
