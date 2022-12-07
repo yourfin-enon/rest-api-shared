@@ -1,6 +1,7 @@
 use chrono::{TimeZone, Utc};
 use libaes::Cipher;
 use my_http_server::{RequestClaim, RequestCredentials};
+use rust_extensions::date_time::DateTimeAsMicroseconds;
 use sha2::{Digest, Sha512};
 
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -22,6 +23,19 @@ pub struct SessionToken {
 
     #[prost(string, tag = "6")]
     pub ip: ::prost::alloc::string::String,
+
+    #[prost(message, repeated, tag = "7")]
+    pub claims: ::prost::alloc::vec::Vec<AccessClaim>,
+}
+
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AccessClaim {
+    #[prost(string, tag = "1")]
+    pub id: ::prost::alloc::string::String,
+    #[prost(int64, tag = "2")]
+    pub expires: i64,
+    #[prost(message, repeated, tag = "3")]
+    pub allowed_ips: ::prost::alloc::vec::Vec<String>,
 }
 
 impl RequestCredentials for SessionToken {
@@ -30,7 +44,24 @@ impl RequestCredentials for SessionToken {
     }
 
     fn get_claims(&self) -> Option<Vec<RequestClaim>> {
-        None
+        if self.claims.len() == 0 {
+            return None;
+        }
+        else {
+            let mapped: Vec<RequestClaim> = self.claims
+            .iter()
+            .map(|c| {
+                let expires = DateTimeAsMicroseconds::new(Utc.timestamp_millis_opt(c.expires).single().unwrap_or_default().timestamp_micros());
+
+                RequestClaim {
+                    allowed_ips: Some(&c.allowed_ips),
+                    expires,
+                    id: &c.id
+                }})
+                .collect();
+
+            return Some(mapped);
+        }
     }
 }
 
@@ -90,19 +121,42 @@ impl SessionToken {
 
 #[cfg(test)]
 mod test {
-    use crate::session_token::SessionToken;
+    use chrono::Utc;
+    use my_http_server::RequestCredentials;
+
+    use crate::session_token::{SessionToken, AccessClaim};
 
     #[test]
     fn test_decrypt() {
         let my_key = "e537d941-f7d2-4939-b97b-ae4722ca56aa";
         let token_as_str = 
-"/3Lqdf/Xjmi4+z+OyUuGY5U9NEnd5BjlaWUJqisHjw3/NzlboJCgqZ0FWB/9+goxLh0hkWb2i7HTMXkUPFT3Sr+6vLjYQMZn6+OPrFmrw3o1h7UpnMwjL/JwyqhfFZjqbUN/ceDXzJJzJhSDQcEMjqA9pDQLWpVjKixWhL5jKT1/0EfQeQpaN/INn9b7CKIn4BLkcGIB/uPVKqUT0Fkdlg==";
+        "Uu9npuPp5UzxttQAqIMonFSlAdGsZ5+9hYj182/or+JxZcTXVYvCNMATCQ3nQ0EdKbmzIiaSHGxQd28iDIzsOkXCIOSoB7hJTE/e2Fd3neXQRFv5QJAOE0HUFVvTX0DtztEdg1lp+KkjT+gJWFgajMJ4fCklD3dTZy1Z7b+l6GsWObnsHiUXlqLcBb6bYxov88THfrXqASA+xdHSHgjBdQAEX8L2rvi5PJWZmTkFoE8=";
         let token = SessionToken::new_from_string(token_as_str, my_key).unwrap();
         println!("{:#?}", token);
 
-        assert_eq!("73dd0bf974ce47ed89606a3788917a18", token.trader_id);
-        assert_eq!("9a558d487ea740b5a53ff938a139fa2e", token.brand_id);
-        assert_eq!("661359502d3e4eaaaae533d5556ab164", token.ip);
-        assert!(1669211025404 == token.expires_ts);
+        assert_eq!("0985e284b3b148798f93d29ccb208a49", token.trader_id);
+        assert_eq!("Monfex", token.brand_id);
+        assert_eq!("::1", token.ip);
+        assert_eq!(1, token.claims.len());
+        assert_eq!("EmailConfirmed", token.claims.first().unwrap().id);
+        assert!(1670421210414 == token.expires_ts);
+    }
+
+    #[test]
+    fn test_get_claims() {
+        let token = SessionToken {
+            claims: vec![AccessClaim {
+                allowed_ips: vec!["1".to_string(), "2".to_string()],
+                expires: Utc::now().timestamp_millis(),
+                id: "Test".to_string()
+            }],
+            ..Default::default()
+        };
+        let creds: Box::<dyn RequestCredentials> = Box::new(token.clone());
+        let creds_claims = creds.get_claims().unwrap();
+
+        assert_eq!(creds_claims.len(), token.claims.len());
+        assert_eq!(creds_claims.get(0).unwrap().id, token.claims.get(0).unwrap().id);
+        assert_eq!(creds_claims.get(0).unwrap().expires.to_chrono_utc().timestamp_millis(), token.claims.get(0).unwrap().expires);
     }
 }
