@@ -3,7 +3,7 @@ use serde_repr::*;
 
 #[derive(Serialize_repr, Deserialize_repr, MyHttpIntegerEnum, Debug)]
 #[repr(i16)]
-pub enum ResultStatus {
+pub enum ApiResultStatus {
     #[http_enum_case(id="0"; description="Operations was successful")]
     Ok,
 
@@ -52,17 +52,17 @@ pub enum ResultStatus {
 
 #[cfg(test)]
 mod test {
-    use super::ResultStatus;
+    use super::ApiResultStatus;
     use serde::{Deserialize, Serialize};
     #[derive(Serialize, Deserialize, Debug)]
     pub struct TestStruct {
-        result: ResultStatus,
+        result: ApiResultStatus,
     }
 
     #[test]
     pub fn test_reult_deserialization() {
         let test_struct = TestStruct {
-            result: ResultStatus::AccessTokenExpired,
+            result: ApiResultStatus::AccessTokenExpired,
         };
 
         let result = serde_json::to_string(&test_struct).unwrap();
