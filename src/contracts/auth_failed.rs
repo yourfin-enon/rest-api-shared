@@ -2,7 +2,7 @@ use std::{str::FromStr};
 use my_http_server::HttpFailResult;
 use my_http_server_swagger::MyHttpObjectStructure;
 use serde::{Deserialize, Serialize};
-use crate::session_token::access_claim::AccessClaimType;
+use crate::token::access_claim::AccessClaimType;
 
 use super::ApiResultStatus;
 

@@ -1,5 +1,5 @@
-pub mod authorisation;
+pub mod http_context;
 pub mod lang_id;
 pub mod middlewares;
-pub mod session_token;
-pub mod shared_contracts;
+pub mod token;
+pub mod contracts;

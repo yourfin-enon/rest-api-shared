@@ -5,7 +5,7 @@ use rust_extensions::date_time::DateTimeAsMicroseconds;
 use sha2::{Digest, Sha512};
 
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SessionToken {
+pub struct AccessToken {
     #[prost(string, tag = "1")]
     pub id: ::prost::alloc::string::String,
 
@@ -38,7 +38,7 @@ pub struct AccessClaim {
     pub allowed_ips: ::prost::alloc::vec::Vec<String>,
 }
 
-impl RequestCredentials for SessionToken {
+impl RequestCredentials for AccessToken {
     fn get_id(&self) -> &str {
         &self.trader_id
     }
@@ -65,7 +65,7 @@ impl RequestCredentials for SessionToken {
     }
 }
 
-impl SessionToken {
+impl AccessToken {
     pub fn get_brand_id(&self) -> &str {
         &self.brand_id
     }
@@ -88,7 +88,7 @@ impl SessionToken {
         }
     }
 
-    pub fn new_from_string(token_as_str: &str, key: &str) -> Option<SessionToken> {
+    pub fn new_from_string(token_as_str: &str, key: &str) -> Option<AccessToken> {
         let decoded_token = base64::decode(token_as_str);
 
         if decoded_token.is_err() {
@@ -108,7 +108,7 @@ impl SessionToken {
         let cipher = Cipher::new_192(&aes_key);
         let decrypted = cipher.cbc_decrypt(&iv, &decoded_token[16..]);
 
-        let result: Result<SessionToken, prost::DecodeError> =
+        let result: Result<AccessToken, prost::DecodeError> =
             prost::Message::decode(&decrypted[..]);
 
         if result.is_err() {
@@ -124,14 +124,14 @@ mod test {
     use chrono::Utc;
     use my_http_server::RequestCredentials;
 
-    use crate::session_token::{SessionToken, AccessClaim};
+    use crate::token::{AccessToken, AccessClaim};
 
     #[test]
     fn test_decrypt() {
         let my_key = "e537d941-f7d2-4939-b97b-ae4722ca56aa";
         let token_as_str = 
         "Uu9npuPp5UzxttQAqIMonFSlAdGsZ5+9hYj182/or+JxZcTXVYvCNMATCQ3nQ0EdKbmzIiaSHGxQd28iDIzsOkXCIOSoB7hJTE/e2Fd3neXQRFv5QJAOE0HUFVvTX0DtztEdg1lp+KkjT+gJWFgajMJ4fCklD3dTZy1Z7b+l6GsWObnsHiUXlqLcBb6bYxov88THfrXqASA+xdHSHgjBdQAEX8L2rvi5PJWZmTkFoE8=";
-        let token = SessionToken::new_from_string(token_as_str, my_key).unwrap();
+        let token = AccessToken::new_from_string(token_as_str, my_key).unwrap();
         println!("{:#?}", token);
 
         assert_eq!("0985e284b3b148798f93d29ccb208a49", token.trader_id);
@@ -144,7 +144,7 @@ mod test {
 
     #[test]
     fn test_get_claims() {
-        let token = SessionToken {
+        let token = AccessToken {
             claims: vec![AccessClaim {
                 allowed_ips: vec!["1".to_string(), "2".to_string()],
                 expires: Utc::now().timestamp_millis(),

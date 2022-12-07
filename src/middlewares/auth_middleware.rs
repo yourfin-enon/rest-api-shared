@@ -8,8 +8,8 @@ use my_no_sql_tcp_reader::MyNoSqlDataReader;
 use rust_extensions::date_time::DateTimeAsMicroseconds;
 
 use crate::{
-    session_token::{SessionToken, TokenKey},
-    shared_contracts::{
+    token::{AccessToken, TokenKey},
+    contracts::{
         auth_failed::AuthenticationFailedApiResponse, ApiResultStatus, ClientSessionNosql,
         LiteClientSessionNosql,
     },
@@ -103,7 +103,7 @@ impl HttpServerMiddleware for AuthMiddleware {
 
         match ctx.request.get_headers().get(AUTH_HEADER) {
             Some(header) => {
-                if let Some(session_token) = SessionToken::new_from_string(
+                if let Some(session_token) = AccessToken::new_from_string(
                     std::str::from_utf8(extract_token(header.as_bytes())).unwrap(),
                     &self.token_key.key,
                 ) {
