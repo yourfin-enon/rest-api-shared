@@ -31,14 +31,20 @@ pub enum ResultStatus {
     #[http_enum_case(id="-8"; description="System error")]
     SystemError = -8,
 
-    #[http_enum_case(id="-9"; description="Expired")]
-    Expired = -9,
+    #[http_enum_case(id="-9"; description="AccessTokenExpired")]
+    AccessTokenExpired = -9,
 
     #[http_enum_case(id="-10"; description="TechnicalError")]
     TechnicalError = -10,
 
     #[http_enum_case(id="-11"; description="CountryRestriction")]
     CountryIsRestricted = -11,
+
+    #[http_enum_case(id="-17"; description="AccessTokenInvalid")]
+    AccessTokenInvalid = -17,
+
+    #[http_enum_case(id="-18"; description="AccessClaimRequired")]
+    AccessClaimRequired = -18,
 
     #[http_enum_case(id="-999"; description="Force Update required")]
     ForceUpdateIsRequired = -999,
@@ -56,7 +62,7 @@ mod test {
     #[test]
     pub fn test_reult_deserialization() {
         let test_struct = TestStruct {
-            result: ResultStatus::Expired,
+            result: ResultStatus::AccessTokenExpired,
         };
 
         let result = serde_json::to_string(&test_struct).unwrap();
