@@ -26,8 +26,8 @@ pub struct AuthorizationFailedApiResponse {
 
 #[derive(Serialize, Deserialize, Debug, MyHttpObjectStructure)]
 pub struct AuthorizationFailedData {
-    #[serde(rename = "missingClaim")]
-    pub claim: AccessClaimType,
+    #[serde(rename = "requiredClaim")]
+    pub required_claim: AccessClaimType,
     #[serde(rename = "description")]
     pub description: String,
 }
@@ -100,9 +100,9 @@ impl my_http_server_controllers::controllers::AuthErrorFactory for AuthFailRespo
             ApiResultStatus::AccessClaimRequired,
             AuthorizationFailedApiResponse::default_desc(),
             AuthorizationFailedData {
-                claim: AccessClaimType::from_str(&claim_name)
+                required_claim: AccessClaimType::from_str(&claim_name)
                     .expect(&format!("Failed to parse claim {}", claim_name)),
-                description: "Missing access claim".to_string(),
+                description: format!("Required access claim: {}", claim_name),
             },
         );
     }
