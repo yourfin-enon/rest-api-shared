@@ -29,6 +29,8 @@ pub struct ClientSessionNosql {
 }
 
 impl MyNoSqlEntity for ClientSessionNosql {
+    const TABLE_NAME: &'static str = "client-sessions";
+
     fn get_partition_key(&self) -> &str {
         &self.partition_key
     }
@@ -40,6 +42,7 @@ impl MyNoSqlEntity for ClientSessionNosql {
     fn get_time_stamp(&self) -> i64 {
         self.created_ts
     }
+
 }
 
 impl ClientSessionNosql {
@@ -69,6 +72,8 @@ pub struct LiteClientSessionNosql {
 }
 
 impl MyNoSqlEntity for LiteClientSessionNosql {
+    const TABLE_NAME: &'static str = "client-sessions-lite";
+
     fn get_partition_key(&self) -> &str {
         &self.partition_key
     }
