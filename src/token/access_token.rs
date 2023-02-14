@@ -142,9 +142,6 @@ impl AccessToken {
         test[..16].copy_from_slice(&iv);
         test[16..].copy_from_slice(&encrypted);
 
-        //Array.ConstrainedCopy((Array) aes.IV, 0, (Array) destinationArray, 0, aes.IV.Length);
-        //Array.ConstrainedCopy((Array) array, 0, (Array) destinationArray, aes.IV.Length, array.Length);
-
         let base64_encoded = &general_purpose::STANDARD_NO_PAD.encode(test);
 
         base64_encoded.to_owned()
