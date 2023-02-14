@@ -137,12 +137,12 @@ impl AccessToken {
         aes_key.copy_from_slice(&key_hash[..24]);
 
         let cipher = Cipher::new_192(&aes_key);
-        let encrypted = cipher.cbc_encrypt(&iv, &prost_encoded[..]);
-        let mut test: Vec<u8> = vec![0; iv.len() + encrypted.len()];
-        test[..16].copy_from_slice(&iv);
-        test[16..].copy_from_slice(&encrypted);
+        let encrypted = cipher.cbc_encrypt(&iv, &prost_encoded);
+        let mut data: Vec<u8> = vec![0; iv.len() + encrypted.len()];
+        data[..16].copy_from_slice(&iv);
+        data[16..].copy_from_slice(&encrypted);
 
-        let base64_encoded = &general_purpose::STANDARD_NO_PAD.encode(test);
+        let base64_encoded = &general_purpose::STANDARD_NO_PAD.encode(data);
 
         base64_encoded.to_owned()
     }
