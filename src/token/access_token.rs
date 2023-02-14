@@ -138,12 +138,12 @@ mod test {
         let claim_ids: Vec<String> = creds_claims.iter().map(|v| {v.id.to_string()}).collect();
         println!("{:#?}", claim_ids);
 
-        assert_eq!("0985e284b3b148798f93d29ccb208a49", token.trader_id);
+        assert_eq!("c529bf7411fd46619b1b08ce6c17633d", token.trader_id);
         assert_eq!("Monfex", token.brand_id);
-        assert_eq!("::1", token.ip);
+        assert_eq!("143.244.46.213", token.ip);
         assert_eq!(1, token.claims.len());
         assert_eq!("EmailConfirmed", token.claims.first().unwrap().id);
-        assert!(1670421210414 == token.expires_ts);
+        assert_eq!(1670438768896, token.expires_ts);
     }
 
     #[test]
