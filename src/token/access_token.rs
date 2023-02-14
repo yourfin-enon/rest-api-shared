@@ -112,11 +112,42 @@ impl AccessToken {
         let result: Result<AccessToken, prost::DecodeError> =
             prost::Message::decode(&decrypted[..]);
 
+        
+
         if result.is_err() {
+            println!("{:?}", result.unwrap());
             return None;
         }
 
         Some(result.unwrap())
+    }
+
+    pub fn to_string(&self, key: &str) -> String {
+        let mut prost_encoded = Vec::new();
+        prost::Message::encode(self, &mut prost_encoded).expect("Failed to encode");
+        
+        let mut iv: [u8; 16] = [0; 16];
+        iv.copy_from_slice(&prost_encoded[..16]);
+
+        // calculate key
+        let mut hasher = Sha512::new();
+        hasher.update(key);
+        let key_hash = hasher.finalize();
+        let mut aes_key = [0; 24];
+        aes_key.copy_from_slice(&key_hash[..24]);
+
+        let cipher = Cipher::new_192(&aes_key);
+        let encrypted = cipher.cbc_encrypt(&iv, &prost_encoded[..]);
+        let mut test: Vec<u8> = vec![0; iv.len() + encrypted.len()];
+        test[..16].copy_from_slice(&iv);
+        test[16..].copy_from_slice(&encrypted);
+
+        //Array.ConstrainedCopy((Array) aes.IV, 0, (Array) destinationArray, 0, aes.IV.Length);
+        //Array.ConstrainedCopy((Array) array, 0, (Array) destinationArray, aes.IV.Length, array.Length);
+
+        let base64_encoded = &general_purpose::STANDARD_NO_PAD.encode(test);
+
+        base64_encoded.to_owned()
     }
 }
 
@@ -126,6 +157,19 @@ mod test {
     use my_http_server::RequestCredentials;
 
     use crate::token::{AccessToken, AccessClaim};
+
+    #[test]
+    fn test_encrypt_decrypt() {
+        let my_key = "e537d941-f7d2-4939-b97b-ae4722ca56aa";
+        let src_token_str = 
+"2KaGFpk+Maqg6Qdh2Axd9o5xyA6obs0gvKDteB/IHzhFk5rQWAAztfsPoqdausKyblkZLOecQphjm83gxJBZ0oyrY82yRsdTpUBZfagozqbM4RMmMfFoMw4Kc6BrDajeXEIJFhyVpq1qiO6MbauKJnOPtM/mNvIsTZ7WDgSpDLx2dkDheWkbKxOAEhOwa5GxdAlS+cQQyiEXSVEngnEciKTnl5w/9gx5b8UC+IBb3P9obSTOhj6uqRbkHuQ7fmdm";
+        let src_token = AccessToken::new_from_string(src_token_str, my_key).unwrap();
+        let encrypted_token_str = src_token.to_string(my_key);
+        let decrypted_token = AccessToken::new_from_string(&encrypted_token_str, my_key).unwrap();
+
+        assert_eq!(src_token.trader_id, decrypted_token.trader_id);
+        assert_eq!(src_token.brand_id, decrypted_token.brand_id);
+    }
 
     #[test]
     fn test_decrypt() {
