@@ -1,3 +1,4 @@
+use base64::{Engine, engine::general_purpose};
 use chrono::{TimeZone, Utc};
 use libaes::Cipher;
 use my_http_server::{RequestClaim, RequestCredentials};
@@ -89,13 +90,13 @@ impl AccessToken {
     }
 
     pub fn new_from_string(token_as_str: &str, key: &str) -> Option<AccessToken> {
-        let decoded_token = base64::decode(token_as_str);
+        let decoded_token = &general_purpose::STANDARD_NO_PAD.decode(token_as_str);
 
         if decoded_token.is_err() {
             return None;
         }
 
-        let decoded_token = decoded_token.unwrap();
+        let decoded_token = decoded_token.as_ref().unwrap();
         let mut iv: [u8; 16] = [0; 16];
         iv.copy_from_slice(&decoded_token[..16]);
 
