@@ -90,7 +90,7 @@ impl AccessToken {
     }
 
     pub fn new_from_string(token_as_str: &str, key: &str) -> Option<AccessToken> {
-        let decoded_token = &general_purpose::STANDARD_NO_PAD.decode(token_as_str);
+        let decoded_token = &general_purpose::STANDARD.decode(token_as_str);
 
         if decoded_token.is_err() {
             return None;
@@ -142,7 +142,7 @@ impl AccessToken {
         data[..16].copy_from_slice(&iv);
         data[16..].copy_from_slice(&encrypted);
 
-        let base64_encoded = &general_purpose::STANDARD_NO_PAD.encode(data);
+        let base64_encoded = &general_purpose::STANDARD.encode(data);
 
         base64_encoded.to_owned()
     }
