@@ -1,9 +1,7 @@
-use base64::{Engine, engine::general_purpose};
 use chrono::{TimeZone, Utc};
-use libaes::Cipher;
 use my_http_server::{RequestClaim, RequestCredentials};
 use rust_extensions::date_time::DateTimeAsMicroseconds;
-use sha2::{Digest, Sha512};
+use super::TokenCipher;
 
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct AccessToken {
@@ -90,61 +88,16 @@ impl AccessToken {
     }
 
     pub fn new_from_string(token_as_str: &str, key: &str) -> Option<AccessToken> {
-        let decoded_token = &general_purpose::STANDARD.decode(token_as_str);
+        let result = TokenCipher::decrypt(token_as_str, key);
 
-        if decoded_token.is_err() {
-            return None;
+        match result {
+            Err(_err) => return None,
+            Ok(data) => return Some(data),
         }
-
-        let decoded_token = decoded_token.as_ref().unwrap();
-        let mut iv: [u8; 16] = [0; 16];
-        iv.copy_from_slice(&decoded_token[..16]);
-
-        let mut hasher = Sha512::new();
-        hasher.update(key);
-        let key_hash = hasher.finalize();
-        let mut aes_key = [0; 24];
-        aes_key.copy_from_slice(&key_hash[..24]);
-
-        let cipher = Cipher::new_192(&aes_key);
-        let decrypted = cipher.cbc_decrypt(&iv, &decoded_token[16..]);
-
-        let result: Result<AccessToken, prost::DecodeError> =
-            prost::Message::decode(&decrypted[..]);
-
-        
-
-        if result.is_err() {
-            println!("{:?}", result.unwrap());
-            return None;
-        }
-
-        Some(result.unwrap())
     }
 
     pub fn to_string(&self, key: &str) -> String {
-        let mut prost_encoded = Vec::new();
-        prost::Message::encode(self, &mut prost_encoded).expect("Failed to encode");
-        
-        let mut iv: [u8; 16] = [0; 16];
-        iv.copy_from_slice(&prost_encoded[..16]);
-
-        // calculate key
-        let mut hasher = Sha512::new();
-        hasher.update(key);
-        let key_hash = hasher.finalize();
-        let mut aes_key = [0; 24];
-        aes_key.copy_from_slice(&key_hash[..24]);
-
-        let cipher = Cipher::new_192(&aes_key);
-        let encrypted = cipher.cbc_encrypt(&iv, &prost_encoded);
-        let mut data: Vec<u8> = vec![0; iv.len() + encrypted.len()];
-        data[..16].copy_from_slice(&iv);
-        data[16..].copy_from_slice(&encrypted);
-
-        let base64_encoded = &general_purpose::STANDARD.encode(data);
-
-        base64_encoded.to_owned()
+        TokenCipher::encrypt(self, key)
     }
 }
 
