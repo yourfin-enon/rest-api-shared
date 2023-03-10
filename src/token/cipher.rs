@@ -54,9 +54,9 @@ impl TokenCipher {
 
         let prost_decoded: Result<T, prost::DecodeError> = prost::Message::decode(&decrypted[..]);
 
-        match prost_decoded {
-            Err(err) => return Err(format!("{}", err)),
-            Ok(data) => return Ok(data),
+        return match prost_decoded {
+            Err(err) => Err(format!("{}", err)),
+            Ok(data) => Ok(data),
         }
     }
 }
