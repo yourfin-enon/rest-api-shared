@@ -101,7 +101,7 @@ impl HttpServerMiddleware for AuthMiddleware {
             return get_next.next(ctx).await;
         }
 
-        match ctx.request.get_headers().get(AUTH_HEADER) {
+        return match ctx.request.get_header(AUTH_HEADER) {
             Some(header) => {
                 if let Some(session_token) = AccessToken::new_from_string(
                     std::str::from_utf8(extract_token(header.as_bytes())).unwrap(),
@@ -133,19 +133,19 @@ impl HttpServerMiddleware for AuthMiddleware {
 
                     ctx.credentials = Some(Box::new(session_token));
 
-                    return get_next.next(ctx).await;
+                    get_next.next(ctx).await
                 } else {
-                    return Err(AuthenticationFailedApiResponse::new(
+                    Err(AuthenticationFailedApiResponse::new(
                         ApiResultStatus::AccessTokenInvalid,
                         "AccessToken invalid".to_string(),
-                    ));                    
+                    ))
                 }
             }
             None => {
-                return Err(AuthenticationFailedApiResponse::new(
+                Err(AuthenticationFailedApiResponse::new(
                     ApiResultStatus::AccessTokenInvalid,
                     "AccessToken not found".to_string(),
-                ));
+                ))
             }
         }
     }
