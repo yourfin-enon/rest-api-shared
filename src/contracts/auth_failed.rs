@@ -88,14 +88,14 @@ use my_http_server_controllers::controllers::documentation::{
 pub struct AuthFailResponseFactory;
 
 impl my_http_server_controllers::controllers::AuthErrorFactory for AuthFailResponseFactory {
-    fn get_not_authenticated(&self) -> my_http_server::HttpFailResult {
+    fn get_not_authenticated(&self) -> HttpFailResult {
         return AuthenticationFailedApiResponse::new(
             ApiResultStatus::AccessTokenInvalid,
             AuthenticationFailedApiResponse::default_desc(),
         );
     }
 
-    fn get_not_authorized(&self, claim_name: String) -> my_http_server::HttpFailResult {
+    fn get_not_authorized(&self, claim_name: String) -> HttpFailResult {
         return AuthorizationFailedApiResponse::new(
             ApiResultStatus::AccessClaimRequired,
             AuthorizationFailedApiResponse::default_desc(),

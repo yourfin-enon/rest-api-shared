@@ -14,9 +14,8 @@ impl GetBrandId for HttpContext {
         }
 
         return Err(HttpFailResult::as_unauthorized(
-            "Can not get brand id Looks like request is unathorised"
-                .to_string()
-                .into(),
+            Some("Can not get brand id Looks like request is unathorised"
+                .to_string()),
         ));
     }
 }

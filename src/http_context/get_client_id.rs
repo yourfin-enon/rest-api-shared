@@ -11,7 +11,7 @@ impl GetClientId for HttpContext {
                 return Ok(value.get_id());
             }
             None => Err(HttpFailResult::as_unauthorized(
-                "User id is not found".to_string().into(),
+                Some("User id is not found".to_string()),
             )),
         }
     }

@@ -6,25 +6,25 @@ use super::TokenCipher;
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct AccessToken {
     #[prost(string, tag = "1")]
-    pub id: ::prost::alloc::string::String,
+    pub id: String,
 
     #[prost(string, tag = "2")]
-    pub trader_id: ::prost::alloc::string::String,
+    pub trader_id: String,
 
     #[prost(int64, tag = "3")]
     pub expires_ts: i64,
 
     #[prost(string, tag = "4")]
-    pub session_id: ::prost::alloc::string::String,
+    pub session_id: String,
 
     #[prost(string, tag = "5")]
-    pub brand_id: ::prost::alloc::string::String,
+    pub brand_id: String,
 
     #[prost(string, tag = "6")]
-    pub ip: ::prost::alloc::string::String,
+    pub ip: String,
 
     #[prost(message, repeated, tag = "7")]
-    pub claims: ::prost::alloc::vec::Vec<AccessClaim>,
+    pub claims: Vec<AccessClaim>,
 }
 
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -128,7 +128,7 @@ mod test {
 "2KaGFpk+Maqg6Qdh2Axd9o5xyA6obs0gvKDteB/IHzhFk5rQWAAztfsPoqdausKyblkZLOecQphjm83gxJBZ0oyrY82yRsdTpUBZfagozqbM4RMmMfFoMw4Kc6BrDajeXEIJFhyVpq1qiO6MbauKJnOPtM/mNvIsTZ7WDgSpDLx2dkDheWkbKxOAEhOwa5GxdAlS+cQQyiEXSVEngnEciKTnl5w/9gx5b8UC+IBb3P9obSTOhj6uqRbkHuQ7fmdm";
         let token = AccessToken::new_from_string(token_as_str, my_key).unwrap();
         println!("{:#?}", token);
-        let creds: Box::<dyn RequestCredentials> = Box::new(token.clone());
+        let creds: Box<dyn RequestCredentials> = Box::new(token.clone());
         let creds_claims = creds.get_claims().unwrap();
         let claim_ids: Vec<String> = creds_claims.iter().map(|v| {v.id.to_string()}).collect();
         println!("{:#?}", claim_ids);
@@ -151,7 +151,7 @@ mod test {
             }],
             ..Default::default()
         };
-        let creds: Box::<dyn RequestCredentials> = Box::new(token.clone());
+        let creds: Box<dyn RequestCredentials> = Box::new(token.clone());
         let creds_claims = creds.get_claims().unwrap();
 
         assert_eq!(creds_claims.len(), token.claims.len());
