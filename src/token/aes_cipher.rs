@@ -4,7 +4,7 @@ use sha2::{Digest, Sha512};
 pub struct AesCipher {}
 
 impl AesCipher {
-    pub fn encrypt(src: &Vec<u8>, key: &str) -> Vec<u8> {
+    pub fn encrypt(src: &[u8], key: &str) -> Vec<u8> {
         let mut hasher = Sha512::new();
         hasher.update(key);
         let key_hash = hasher.finalize();
@@ -24,7 +24,7 @@ impl AesCipher {
         data
     }
 
-    pub fn decrypt(src: &Vec<u8>, key: &str) -> Vec<u8> {
+    pub fn decrypt(src: &[u8], key: &str) -> Vec<u8> {
         let mut hasher = Sha512::new();
         hasher.update(key);
         let key_hash = hasher.finalize();
