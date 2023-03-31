@@ -26,6 +26,8 @@ pub struct ClientSessionNosql {
     pub ip_country: Option<String>,
     #[serde(rename = "ExpiresTs")]
     pub expires_ts: i64,
+    #[serde(rename = "LoginTwoFaConfirmed")]
+    pub login_two_fa_confirmed: bool,
 }
 
 impl MyNoSqlEntity for ClientSessionNosql {
