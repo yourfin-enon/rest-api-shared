@@ -43,23 +43,23 @@ impl RequestCredentials for AccessToken {
     }
 
     fn get_claims(&self) -> Option<Vec<RequestClaim>> {
-        if self.claims.len() == 0 {
-            return None;
-        }
-        else {
+        return if self.claims.is_empty() {
+            None
+        } else {
             let mapped: Vec<RequestClaim> = self.claims
-            .iter()
-            .map(|c| {
-                let expires = DateTimeAsMicroseconds::new(Utc.timestamp_millis_opt(c.expires).single().unwrap_or_default().timestamp_micros());
+                .iter()
+                .map(|c| {
+                    let expires = DateTimeAsMicroseconds::new(Utc.timestamp_millis_opt(c.expires).single().unwrap_or_default().timestamp_micros());
 
-                RequestClaim {
-                    allowed_ips: None,
-                    expires,
-                    id: &c.id
-                }})
+                    RequestClaim {
+                        allowed_ips: None,
+                        expires,
+                        id: &c.id
+                    }
+                })
                 .collect();
 
-            return Some(mapped);
+            Some(mapped)
         }
     }
 }
@@ -77,22 +77,26 @@ impl AccessToken {
         self.trader_id
     }
 
+    pub fn get_session_id(&self) -> &str {
+        &self.session_id
+    }
+
     pub fn get_expires_microseconds(&self) -> i64 {
         let expires = Utc.timestamp_millis_opt(self.expires_ts).single();
 
-        if let Some(expires) = expires {
-            return expires.timestamp_micros();
+        return if let Some(expires) = expires {
+            expires.timestamp_micros()
         } else {
-            return 0;
+            0
         }
     }
 
     pub fn new_from_string(token_as_str: &str, key: &str) -> Option<AccessToken> {
         let result = TokenCipher::decrypt(token_as_str, key);
 
-        match result {
-            Err(_err) => return None,
-            Ok(data) => return Some(data),
+        return match result {
+            Err(_err) => None,
+            Ok(data) => Some(data),
         }
     }
 

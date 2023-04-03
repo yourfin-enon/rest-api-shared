@@ -17,6 +17,7 @@ use crate::{
 
 const AUTH_HEADER: &str = "authorization";
 pub const KV_BRAND_ID: &str = "BRAND_ID";
+pub const KV_SESSION_ID: &str = "SESSION_ID";
 
 pub struct AuthMiddleware {
     token_key: TokenKey,
@@ -130,6 +131,10 @@ impl HttpServerMiddleware for AuthMiddleware {
                     let brand_id = session_token.get_brand_id().to_string();
                     ctx.request
                         .set_key_value(KV_BRAND_ID.to_string(), brand_id.into_bytes());
+
+                    let session_id = session_token.get_session_id().to_owned();
+                    ctx.request
+                        .set_key_value(KV_SESSION_ID.to_string(), session_id.into_bytes());
 
                     ctx.credentials = Some(Box::new(session_token));
 
