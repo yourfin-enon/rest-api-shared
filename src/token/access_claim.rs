@@ -7,12 +7,16 @@ use serde_repr::{Serialize_repr,Deserialize_repr};
 pub enum AccessClaimType {
     #[http_enum_case(id="0"; description="EmailConfirmed")]
     EmailConfirmed,
+    #[http_enum_case(id="1"; description="LoginTwoFaConfirmed")]
+    LoginTwoFaConfirmed,
 }
 
 impl fmt::Display for AccessClaimType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             AccessClaimType::EmailConfirmed => write!(f, "EmailConfirmed"),
+            AccessClaimType::LoginTwoFaConfirmed => write!(f, "LoginTwoFaConfirmed"),
+
         }
     }
 }
