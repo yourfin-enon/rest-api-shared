@@ -9,6 +9,8 @@ pub enum AccessClaimType {
     EmailConfirmed,
     #[http_enum_case(id="1"; description="LoginTwoFaConfirmed")]
     LoginTwoFaConfirmed,
+    #[http_enum_case(id="2"; description="WithdrawalTwoFaConfirmed")]
+    WithdrawalTwoFaConfirmed,
 }
 
 impl fmt::Display for AccessClaimType {
@@ -16,7 +18,7 @@ impl fmt::Display for AccessClaimType {
         match self {
             AccessClaimType::EmailConfirmed => write!(f, "EmailConfirmed"),
             AccessClaimType::LoginTwoFaConfirmed => write!(f, "LoginTwoFaConfirmed"),
-
+            AccessClaimType::WithdrawalTwoFaConfirmed => write!(f, "WithdrawalTwoFaConfirmed"),
         }
     }
 }
