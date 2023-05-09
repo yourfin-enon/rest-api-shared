@@ -8,11 +8,11 @@ const IP_HEADERS: [&str; 4] = [
 ];
 
 pub trait GetIp {
-    fn get_country_alpha2(&self) -> Result<String, HttpFailResult>;
+    fn get_ip(&self) -> Result<String, HttpFailResult>;
 }
 
 impl GetIp for HttpContext {
-    fn get_country_alpha2(&self) -> Result<String, HttpFailResult> {
+    fn get_ip(&self) -> Result<String, HttpFailResult> {
         for header in IP_HEADERS {
             if let Some(header_value) = self.request.get_header(header) {
                 if let Ok(parsed_header_value) = std::str::from_utf8(header_value.as_bytes()) {
