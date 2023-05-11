@@ -21,7 +21,7 @@ impl GetIp for HttpContext {
             }
         }
 
-        println!("Can't get country",);
+        println!("Can't get IP. None of the headers found {:?}", IP_HEADERS);
 
         return Ok("".to_string());
     }

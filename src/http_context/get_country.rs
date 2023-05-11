@@ -21,7 +21,7 @@ impl GetCountry for HttpContext {
             }
         }
         
-        println!("Can't get country. Not found header {} nor {}", HEADER_1, HEADER_2);
+        println!("Can't get country. Non of the header found: {}, {}", HEADER_1, HEADER_2);
 
         return Ok("".to_string());
     }

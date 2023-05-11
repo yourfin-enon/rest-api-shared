@@ -24,6 +24,8 @@ impl GetLang for HttpContext {
             }
         }
 
+        println!("Can't get LANG. Header not found {}. Using default", LANG_HEADER);
+
         return Ok(DEFAULT_LANG.to_string());
     }
 }
