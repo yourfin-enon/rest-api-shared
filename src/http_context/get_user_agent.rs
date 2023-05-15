@@ -1,6 +1,6 @@
 use my_http_server::{HttpContext, HttpFailResult};
 
-const HEADER: &str = "Accept-Language";
+const HEADER: &str = "User-Agent";
 
 pub trait GetUserAgent {
     fn get_user_agent(&self) -> Result<String, HttpFailResult>;
