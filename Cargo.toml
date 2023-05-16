@@ -1,6 +1,6 @@
 [package]
 name = "rest-api-shared"
-version = "0.8.7"
+version = "0.8.8"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -34,3 +34,4 @@ sha2 = "*"
 isolang = "*"
 uuid = { version = "*", features = ["v4"] }
 chrono = "*"
+rust_iso3166 = "*"

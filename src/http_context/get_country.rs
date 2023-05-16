@@ -7,6 +7,7 @@ const COUNTRY_HEADERS: [&str; 2] = [
 
 pub trait GetCountry {
     fn get_country_alpha2(&self) -> Result<String, HttpFailResult>;
+    fn get_country_alpha3(&self) -> Result<String, HttpFailResult>;
 }
 
 impl GetCountry for HttpContext {
@@ -19,8 +20,26 @@ impl GetCountry for HttpContext {
             }
         }
 
-        println!("Can't get country. Non of the header found:  {:?}", COUNTRY_HEADERS);
+        println!("Can't get_country_alpha2. Non of the header found:  {:?}", COUNTRY_HEADERS);
 
         return Ok("".to_string());
+    }
+
+    fn get_country_alpha3(&self) -> Result<String, HttpFailResult> {
+        let alpha2_code = self.get_country_alpha2();
+
+        let Ok(alpha2_code) = alpha2_code else {
+            return alpha2_code;
+        };
+
+        let country = rust_iso3166::from_alpha2(&alpha2_code);
+
+        let Some(country) = country else {
+            println!("Can't get_country_alpha3. Not found alpha 3 code for {:?}", alpha2_code);
+
+            return Ok("".to_string());
+        };
+
+        return Ok(country.alpha3.to_string());
     }
 }
