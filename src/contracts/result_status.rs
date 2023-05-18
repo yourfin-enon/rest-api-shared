@@ -46,6 +46,9 @@ pub enum ApiResultStatus {
     #[http_enum_case(id="-18"; description="AccessClaimRequired")]
     AccessClaimRequired = -18,
 
+    #[http_enum_case(id="-19"; description="OperationBlocked")]
+    OperationBlocked = -19,
+
     #[http_enum_case(id="-999"; description="Force Update required")]
     ForceUpdateIsRequired = -999,
 }
