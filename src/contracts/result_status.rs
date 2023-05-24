@@ -40,6 +40,9 @@ pub enum ApiResultStatus {
     #[http_enum_case(id="-11"; description="CountryRestriction")]
     CountryIsRestricted = -11,
 
+    #[http_enum_case(id="-16"; description="GoogleCodeRequired")]
+    GoogleCodeRequired = -16,
+
     #[http_enum_case(id="-17"; description="AccessTokenInvalid")]
     AccessTokenInvalid = -17,
 
@@ -48,6 +51,12 @@ pub enum ApiResultStatus {
 
     #[http_enum_case(id="-19"; description="OperationBlocked")]
     OperationBlocked = -19,
+
+    #[http_enum_case(id="-20"; description="Failed validation for MinInvestAmount")]
+    MinInvestAmountInvalid = -20,
+
+    #[http_enum_case(id="-21"; description="Failed validation for MaxCumulativeInvestVolumeInvalid")]
+    MaxCumulativeInvestVolumeInvalid = -21,
 
     #[http_enum_case(id="-999"; description="Force Update required")]
     ForceUpdateIsRequired = -999,
