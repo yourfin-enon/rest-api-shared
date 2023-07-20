@@ -152,14 +152,17 @@ impl HttpServerMiddleware for AuthMiddleware {
                     "AccessToken not found".to_string(),
                 ))
             }
-        }
+        };
     }
 }
 
 fn extract_token(src: &[u8]) -> &[u8] {
-    if src[6] == b' ' {
+    let split_index = 6;
+
+    if src.len() > split_index && src[split_index] == b' ' {
         return &src[7..];
     }
+
     src
 }
 
