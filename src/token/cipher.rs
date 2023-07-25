@@ -23,6 +23,11 @@ impl TokenCipher {
 
         let base64_decoded = base64_decoded.as_ref().unwrap();
         let decrypted = AesCipher::decrypt(&base64_decoded, key);
+
+        let Ok(decrypted) = decrypted else {
+            return Err(decrypted.unwrap_err());
+        };
+
         let prost_decoded: Result<T, prost::DecodeError> = Message::decode(&decrypted[..]);
 
         return match prost_decoded {
