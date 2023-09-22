@@ -1,8 +1,8 @@
-use std::{str::FromStr};
+use crate::token::access_claim::AccessClaimType;
 use my_http_server::HttpFailResult;
 use my_http_server_swagger::MyHttpObjectStructure;
 use serde::{Deserialize, Serialize};
-use crate::token::access_claim::AccessClaimType;
+use std::str::FromStr;
 
 use super::ApiResultStatus;
 
@@ -45,13 +45,14 @@ impl AuthorizationFailedApiResponse {
         };
 
         let content = serde_json::to_vec(&result).unwrap();
-        HttpFailResult {
-            content_type: my_http_server::WebContentType::Json,
-            status_code: 403,
+
+        HttpFailResult::new(
+            my_http_server::WebContentType::Json,
+            403,
             content,
-            write_telemetry: false,
-            write_to_log: false,
-        }
+            true,
+            true,
+        )
     }
 
     pub fn default_desc() -> String {
@@ -67,13 +68,14 @@ impl AuthenticationFailedApiResponse {
         };
 
         let content = serde_json::to_vec(&result).unwrap();
-        HttpFailResult {
-            content_type: my_http_server::WebContentType::Json,
-            status_code: 401,
+
+        HttpFailResult::new(
+            my_http_server::WebContentType::Json,
+            403,
             content,
-            write_telemetry: false,
-            write_to_log: false,
-        }
+            true,
+            true,
+        )
     }
 
     pub fn default_desc() -> String {
@@ -89,14 +91,14 @@ pub struct AuthFailResponseFactory;
 
 impl my_http_server_controllers::controllers::AuthErrorFactory for AuthFailResponseFactory {
     fn get_not_authenticated(&self) -> HttpFailResult {
-        return AuthenticationFailedApiResponse::new(
+        AuthenticationFailedApiResponse::new(
             ApiResultStatus::AccessTokenInvalid,
             AuthenticationFailedApiResponse::default_desc(),
-        );
+        )
     }
 
     fn get_not_authorized(&self, claim_name: String) -> HttpFailResult {
-        return AuthorizationFailedApiResponse::new(
+        AuthorizationFailedApiResponse::new(
             ApiResultStatus::AccessClaimRequired,
             AuthorizationFailedApiResponse::default_desc(),
             AuthorizationFailedData {
@@ -104,7 +106,7 @@ impl my_http_server_controllers::controllers::AuthErrorFactory for AuthFailRespo
                     .expect(&format!("Failed to parse claim {}", claim_name)),
                 description: format!("Required access claim: {}", claim_name),
             },
-        );
+        )
     }
     fn get_global_http_fail_result_types(&self) -> Option<Vec<HttpResult>> {
         let authentication_http_structure =
