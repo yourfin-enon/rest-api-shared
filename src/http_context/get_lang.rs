@@ -10,21 +10,13 @@ pub trait GetLang {
 
 impl GetLang for HttpContext {
     fn get_lang(&self) -> Result<String, HttpFailResult> {
-        if let Some(header_value) = self.request.get_key_value(LANG_HEADER) {
-            let parsed_header = std::str::from_utf8(header_value);
-            let Ok(parsed_header_value) = parsed_header else {
-                println!(
-                    "Can't get LANG. Failed to parse {}. Using default",
-                    parsed_header.unwrap_err()
-                );
-                return Ok(DEFAULT_LANG.to_string());
-            };
-            let lang = parse_lang(parsed_header_value);
+        if let Some(header_value) = self.request.get_header(LANG_HEADER) {
+            let lang = parse_lang(header_value);
 
             let Some(lang) = lang else {
                 println!(
                     "Can't get LANG. Failed to parse value {}. Using default",
-                    parsed_header_value
+                    header_value
                 );
 
                 return Ok(DEFAULT_LANG.to_string());
