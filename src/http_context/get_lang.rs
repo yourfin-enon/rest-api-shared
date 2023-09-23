@@ -52,17 +52,17 @@ fn parse_lang(src: &str) -> Option<String> {
             return None;
         };
 
-        let Some(lang) = Language::from_639_1(lang) else {
-            return None;
-        };
+        Language::from_639_1(lang)?
+    } else if lang.len() == 3 {
+        let from_three_letters = Language::from_639_3(lang);
 
-        lang
+        if let Some(from_three_letters) = from_three_letters {
+            from_three_letters
+        } else {
+            Language::from_639_1(&lang[..2])?
+        }
     } else {
-        let Some(lang) = Language::from_639_1(lang) else {
-            return None;
-        };
-
-        lang
+        Language::from_639_1(lang)?
     };
 
     let lang = lang.to_639_3().to_uppercase();
@@ -75,22 +75,36 @@ mod test {
     use crate::http_context::get_lang::parse_lang;
 
     #[test]
-    fn parse_ukr_from_long_value() {
+    fn parse_uk_from_long_value() {
         let lang = parse_lang("uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7");
 
         assert_eq!("UKR", lang.unwrap());
     }
 
     #[test]
-    fn parse_ukr_from_short_value() {
+    fn parse_uk_from_short_value() {
         let lang = parse_lang("uk");
 
         assert_eq!("UKR", lang.unwrap());
     }
 
     #[test]
-    fn parse_esp_from_short_value() {
+    fn parse_es_from_short_value() {
         let lang = parse_lang("es");
+
+        assert_eq!("SPA", lang.unwrap());
+    }
+
+    #[test]
+    fn parse_es_from_short_value_with_trailing() {
+        let lang = parse_lang("es;");
+
+        assert_eq!("SPA", lang.unwrap());
+    }
+
+    #[test]
+    fn parse_spa_from_short_value_with_trailing() {
+        let lang = parse_lang("spa");
 
         assert_eq!("SPA", lang.unwrap());
     }
