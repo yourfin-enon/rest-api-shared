@@ -71,7 +71,7 @@ impl AuthenticationFailedApiResponse {
 
         HttpFailResult::new(
             my_http_server::WebContentType::Json,
-            403,
+            401,
             content,
             true,
             true,
