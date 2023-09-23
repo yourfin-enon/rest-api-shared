@@ -45,7 +45,7 @@ impl AuthMiddleware {
     ) -> Self {
         let mut result = Self::new(token_key, sessions_reader);
         result.add_start_path_to_ignore("/swagger");
-        result.add_start_path_to_ignore("/metrics");
+        result.add_start_path_to_ignore("/api/metrics");
 
         result
     }
