@@ -30,7 +30,7 @@ impl TokenCipher {
 
         let prost_decoded: Result<T, prost::DecodeError> = Message::decode(&decrypted[..]);
 
-        return match prost_decoded {
+        match prost_decoded {
             Err(err) => Err(format!("{}", err)),
             Ok(data) => Ok(data),
         }
