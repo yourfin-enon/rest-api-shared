@@ -15,7 +15,7 @@ impl AesCipher {
         iv.copy_from_slice(&src[..16]);
 
         let cipher = Cipher::new_192(&aes_key);
-        let mut encrypted = cipher.cbc_encrypt(&iv, &src);
+        let mut encrypted = cipher.cbc_encrypt(&iv, src);
 
         let mut data: Vec<u8> = Vec::with_capacity(iv.len() + encrypted.len());
         data.append(&mut iv);
