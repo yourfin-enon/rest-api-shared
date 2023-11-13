@@ -22,7 +22,7 @@ impl TokenCipher {
         }
 
         let base64_decoded = base64_decoded.as_ref().unwrap();
-        let decrypted = AesCipher::decrypt(&base64_decoded, key);
+        let decrypted = AesCipher::decrypt(base64_decoded, key);
 
         let Ok(decrypted) = decrypted else {
             return Err(decrypted.unwrap_err());
