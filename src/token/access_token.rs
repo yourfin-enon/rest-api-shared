@@ -1,6 +1,6 @@
 use chrono::{TimeZone, Utc};
-use my_http_server::{RequestClaim, RequestCredentials};
 use rust_extensions::date_time::DateTimeAsMicroseconds;
+use service_sdk::my_http_server::{RequestClaim, RequestCredentials};
 use super::TokenCipher;
 
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -108,8 +108,7 @@ impl AccessToken {
 #[cfg(test)]
 mod test {
     use chrono::Utc;
-    use my_http_server::RequestCredentials;
-
+    use service_sdk::my_http_server::RequestCredentials;
     use crate::token::{AccessToken, AccessClaim};
 
     #[test]

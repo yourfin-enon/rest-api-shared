@@ -1,4 +1,4 @@
-use my_http_server::HttpContext;
+use service_sdk::my_http_server::HttpContext;
 
 const ENGLISH: &str = "en";
 

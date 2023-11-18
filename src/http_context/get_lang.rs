@@ -1,5 +1,5 @@
 use isolang::Language;
-use my_http_server::{HttpContext, HttpFailResult};
+use service_sdk::my_http_server::{HttpContext, HttpFailResult};
 
 const LANG_HEADER: &str = "Accept-Language";
 const DEFAULT_LANG: &str = "ENG";

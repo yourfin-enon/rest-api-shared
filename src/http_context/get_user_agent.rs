@@ -1,4 +1,4 @@
-use my_http_server::{HttpContext, HttpFailResult};
+use service_sdk::my_http_server::{HttpContext, HttpFailResult};
 
 const HEADER: &str = "User-Agent";
 

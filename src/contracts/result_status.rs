@@ -1,5 +1,6 @@
-use my_http_server_swagger::MyHttpIntegerEnum;
 use serde_repr::*;
+use service_sdk::my_http_server::macros::MyHttpIntegerEnum;
+use service_sdk::my_http_server;
 
 #[derive(Serialize_repr, Deserialize_repr, MyHttpIntegerEnum, Debug)]
 #[repr(i16)]

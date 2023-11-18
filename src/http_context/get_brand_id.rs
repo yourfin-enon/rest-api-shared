@@ -1,5 +1,4 @@
-use my_http_server::{HttpContext, HttpFailResult};
-
+use service_sdk::my_http_server::{HttpContext, HttpFailResult};
 use crate::middlewares::KV_BRAND_ID;
 
 pub trait GetBrandId {

@@ -1,6 +1,7 @@
 use std::fmt;
-use my_http_server_swagger::MyHttpIntegerEnum;
 use serde_repr::{Serialize_repr,Deserialize_repr};
+use service_sdk::my_http_server;
+use service_sdk::my_http_server::macros::{MyHttpIntegerEnum};
 
 #[derive(Serialize_repr, Deserialize_repr, MyHttpIntegerEnum, Debug)]
 #[repr(i16)]

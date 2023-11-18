@@ -1,4 +1,4 @@
-use my_http_server::{HttpContext, HttpFailResult};
+use service_sdk::my_http_server::{HttpContext, HttpFailResult};
 
 const IP_HEADERS: [&str; 4] = [
     "CF-Connecting-IP",

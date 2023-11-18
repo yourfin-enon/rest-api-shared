@@ -1,7 +1,8 @@
-use my_http_server_swagger::MyHttpObjectStructure;
 use rust_extensions::date_time::DateTimeAsMicroseconds;
 use serde::{Deserialize, Serialize};
+use service_sdk::my_http_server::macros::{MyHttpObjectStructure};
 use super::ApiResultStatus;
+use service_sdk::my_http_server;
 
 #[derive(Serialize, Deserialize, Debug, MyHttpObjectStructure)]
 pub struct OperationBlockedApiResponse {

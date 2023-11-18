@@ -1,8 +1,12 @@
 use crate::token::access_claim::AccessClaimType;
-use my_http_server::HttpFailResult;
-use my_http_server_swagger::MyHttpObjectStructure;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
+use service_sdk::my_http_server::{HttpFailResult, WebContentType};
+use service_sdk::my_http_server::controllers::AuthErrorFactory;
+use service_sdk::my_http_server::controllers::documentation::HttpDataType;
+use service_sdk::my_http_server::controllers::documentation::out_results::HttpResult;
+use service_sdk::my_http_server::macros::MyHttpObjectStructure;
+use service_sdk::my_http_server;
 
 use super::ApiResultStatus;
 
@@ -47,7 +51,7 @@ impl AuthorizationFailedApiResponse {
         let content = serde_json::to_vec(&result).unwrap();
 
         HttpFailResult::new(
-            my_http_server::WebContentType::Json,
+            WebContentType::Json,
             403,
             content,
             true,
@@ -70,7 +74,7 @@ impl AuthenticationFailedApiResponse {
         let content = serde_json::to_vec(&result).unwrap();
 
         HttpFailResult::new(
-            my_http_server::WebContentType::Json,
+            WebContentType::Json,
             401,
             content,
             true,
@@ -83,13 +87,10 @@ impl AuthenticationFailedApiResponse {
     }
 }
 
-use my_http_server_controllers::controllers::documentation::{
-    data_types::HttpDataType, out_results::HttpResult,
-};
 
 pub struct AuthFailResponseFactory;
 
-impl my_http_server_controllers::controllers::AuthErrorFactory for AuthFailResponseFactory {
+impl AuthErrorFactory for AuthFailResponseFactory {
     fn get_not_authenticated(&self) -> HttpFailResult {
         AuthenticationFailedApiResponse::new(
             ApiResultStatus::AccessTokenInvalid,
