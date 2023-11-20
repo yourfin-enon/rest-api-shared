@@ -1,13 +1,9 @@
-use my_no_sql_server_abstractions::MyNoSqlEntity;
-use rust_extensions::date_time::DateTimeAsMicroseconds;
+service_sdk::macros::use_my_no_sql_entity!();
 use serde::{Serialize, Deserialize};
 
+#[my_no_sql_entity("client-sessions")]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ClientSessionNosql {
-    #[serde(rename = "PartitionKey")]
-    pub partition_key: String,
-    #[serde(rename = "RowKey")]
-    pub row_key: String,
     #[serde(rename = "Id")]
     pub id: String,
     #[serde(rename = "TraderId")]
@@ -30,23 +26,6 @@ pub struct ClientSessionNosql {
     pub login_two_fa_confirmed: bool,
 }
 
-impl MyNoSqlEntity for ClientSessionNosql {
-    const TABLE_NAME: &'static str = "client-sessions";
-
-    fn get_partition_key(&self) -> &str {
-        &self.partition_key
-    }
-
-    fn get_row_key(&self) -> &str {
-        &self.row_key
-    }
-
-    fn get_time_stamp(&self) -> i64 {
-        self.created_ts
-    }
-
-}
-
 impl ClientSessionNosql {
     pub fn get_table_name() -> String {
         String::from("client-sessions")
@@ -61,33 +40,17 @@ impl ClientSessionNosql {
     }
 }
 
+
+
+#[my_no_sql_entity("client-sessions-lite")]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LiteClientSessionNosql {
-    #[serde(rename = "PartitionKey")]
-    pub partition_key: String,
-    #[serde(rename = "RowKey")]
-    pub row_key: String,
     #[serde(rename = "Id")]
     pub id: String,
     #[serde(rename = "TraderId")]
     pub trader_id: String,
 }
 
-impl MyNoSqlEntity for LiteClientSessionNosql {
-    const TABLE_NAME: &'static str = "client-sessions-lite";
-
-    fn get_partition_key(&self) -> &str {
-        &self.partition_key
-    }
-
-    fn get_row_key(&self) -> &str {
-        &self.row_key
-    }
-
-    fn get_time_stamp(&self) -> i64 {
-        DateTimeAsMicroseconds::now().unix_microseconds
-    }
-}
 
 impl LiteClientSessionNosql {
     pub fn get_table_name() -> String {
@@ -102,3 +65,4 @@ impl LiteClientSessionNosql {
         id
     }
 }
+

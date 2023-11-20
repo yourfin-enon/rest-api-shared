@@ -1,22 +1,17 @@
 [package]
 name = "rest-api-shared"
-version = "0.10.10"
+version = "1.0.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-service-sdk = { git = "https://github.com/MyJetTools/service-sdk", tag = "0.2.4", features = ["macros"] }
-
-my-no-sql-server-abstractions = { tag = "0.1.1", git = "https://github.com/MyJetTools/my-no-sql-server-abstractions.git" }
-my-no-sql-tcp-reader = { tag = "0.2.0", git = "https://github.com/MyJetTools/my-no-sql-tcp-reader" }
-
-rust-extensions = { tag = "0.1.4", git = "https://github.com/MyJetTools/rust-extensions.git" }
-
+service-sdk = { tag = "0.2.4", git = "https://github.com/MyJetTools/service-sdk.git", features = [
+    "my-nosql-sdk",
+    "macros",
+    "my-nosql-data-reader-sdk",
+] }
 async-trait = "*"
-tonic = { version = "*", features = ["tls", "tls-roots"] }
-tokio = { version = "*", features = ["full"] }
-hyper = { version = "*", features = ["full"] }
 prost = "*"
 serde = { version = "*", features = ["derive"] }
 tokio-util = "*"

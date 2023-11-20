@@ -1,6 +1,6 @@
 use std::sync::Arc;
-use my_no_sql_tcp_reader::MyNoSqlDataReader;
-use rust_extensions::date_time::DateTimeAsMicroseconds;
+use service_sdk::{my_no_sql_sdk::reader::MyNoSqlDataReader};
+use service_sdk::rust_extensions::date_time::DateTimeAsMicroseconds;
 use service_sdk::my_http_server::{HttpContext, HttpFailResult, HttpOkResult, HttpPath, HttpServerMiddleware, HttpServerRequestFlow};
 
 use crate::{
@@ -19,13 +19,13 @@ pub struct AuthMiddleware {
     token_key: TokenKey,
     ignore_full_paths: Option<Vec<HttpPath>>,
     ignore_start_path: Option<Vec<HttpPath>>,
-    sessions_reader: Arc<MyNoSqlDataReader<LiteClientSessionNosql>>,
+    sessions_reader: Arc<dyn MyNoSqlDataReader<LiteClientSessionNosql> + Send + Sync + 'static>,
 }
 
 impl AuthMiddleware {
     pub fn new(
         token_key: TokenKey,
-        sessions_reader: Arc<MyNoSqlDataReader<LiteClientSessionNosql>>,
+        sessions_reader: Arc<dyn MyNoSqlDataReader<LiteClientSessionNosql> + Send + Sync + 'static>,
     ) -> Self {
         Self {
             token_key,
@@ -37,7 +37,7 @@ impl AuthMiddleware {
 
     pub fn new_with_default_paths_to_ignore(
         token_key: TokenKey,
-        sessions_reader: Arc<MyNoSqlDataReader<LiteClientSessionNosql>>,
+        sessions_reader: Arc<dyn MyNoSqlDataReader<LiteClientSessionNosql> + Send + Sync + 'static>,
     ) -> Self {
         let mut result = Self::new(token_key, sessions_reader);
         result.add_start_path_to_ignore("/swagger");
@@ -127,7 +127,7 @@ impl HttpServerMiddleware for AuthMiddleware {
                         ));
                     }
 
-                    let brand_id = session_token.get_brand_id().to_string();
+                    let brand_id = session_token.get_brand_id().to_owned();
                     ctx.request
                         .set_key_value(KV_BRAND_ID.to_string(), brand_id.into_bytes());
 

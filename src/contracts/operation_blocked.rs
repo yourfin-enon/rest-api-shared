@@ -1,4 +1,4 @@
-use rust_extensions::date_time::DateTimeAsMicroseconds;
+use service_sdk::rust_extensions::date_time::DateTimeAsMicroseconds;
 use serde::{Deserialize, Serialize};
 use service_sdk::my_http_server::macros::{MyHttpObjectStructure};
 use super::ApiResultStatus;
