@@ -1,12 +1,12 @@
 use crate::token::access_claim::AccessClaimType;
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
-use service_sdk::my_http_server::{HttpFailResult, WebContentType};
-use service_sdk::my_http_server::controllers::AuthErrorFactory;
-use service_sdk::my_http_server::controllers::documentation::HttpDataType;
-use service_sdk::my_http_server::controllers::documentation::out_results::HttpResult;
-use service_sdk::my_http_server::macros::MyHttpObjectStructure;
 use service_sdk::my_http_server;
+use service_sdk::my_http_server::controllers::documentation::out_results::HttpResult;
+use service_sdk::my_http_server::controllers::documentation::HttpDataType;
+use service_sdk::my_http_server::controllers::AuthErrorFactory;
+use service_sdk::my_http_server::macros::MyHttpObjectStructure;
+use service_sdk::my_http_server::{HttpFailResult, WebContentType};
+use std::str::FromStr;
 
 use super::ApiResultStatus;
 
@@ -50,13 +50,7 @@ impl AuthorizationFailedApiResponse {
 
         let content = serde_json::to_vec(&result).unwrap();
 
-        HttpFailResult::new(
-            WebContentType::Json,
-            403,
-            content,
-            true,
-            true,
-        )
+        HttpFailResult::new(WebContentType::Json, 403, content, true, true)
     }
 
     pub fn default_desc() -> String {
@@ -73,20 +67,13 @@ impl AuthenticationFailedApiResponse {
 
         let content = serde_json::to_vec(&result).unwrap();
 
-        HttpFailResult::new(
-            WebContentType::Json,
-            401,
-            content,
-            true,
-            true,
-        )
+        HttpFailResult::new(WebContentType::Json, 401, content, true, true)
     }
 
     pub fn default_desc() -> String {
         "Authentication required".to_string()
     }
 }
-
 
 pub struct AuthFailResponseFactory;
 

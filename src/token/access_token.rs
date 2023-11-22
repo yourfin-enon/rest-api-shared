@@ -1,7 +1,7 @@
+use super::TokenCipher;
 use chrono::{TimeZone, Utc};
 use service_sdk::my_http_server::{RequestClaim, RequestCredentials};
 use service_sdk::rust_extensions::date_time::DateTimeAsMicroseconds;
-use super::TokenCipher;
 
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct AccessToken {
@@ -46,21 +46,27 @@ impl RequestCredentials for AccessToken {
         return if self.claims.is_empty() {
             None
         } else {
-            let mapped: Vec<RequestClaim> = self.claims
+            let mapped: Vec<RequestClaim> = self
+                .claims
                 .iter()
                 .map(|c| {
-                    let expires = DateTimeAsMicroseconds::new(Utc.timestamp_millis_opt(c.expires).single().unwrap_or_default().timestamp_micros());
+                    let expires = DateTimeAsMicroseconds::new(
+                        Utc.timestamp_millis_opt(c.expires)
+                            .single()
+                            .unwrap_or_default()
+                            .timestamp_micros(),
+                    );
 
                     RequestClaim {
                         allowed_ips: None,
                         expires,
-                        id: &c.id
+                        id: &c.id,
                     }
                 })
                 .collect();
 
             Some(mapped)
-        }
+        };
     }
 }
 
@@ -88,7 +94,7 @@ impl AccessToken {
             expires.timestamp_micros()
         } else {
             0
-        }
+        };
     }
 
     pub fn new_from_string(token_as_str: &str, key: &str) -> Option<AccessToken> {
@@ -97,7 +103,7 @@ impl AccessToken {
         return match result {
             Err(_err) => None,
             Ok(data) => Some(data),
-        }
+        };
     }
 
     pub fn to_string(&self, key: &str) -> String {
@@ -107,9 +113,9 @@ impl AccessToken {
 
 #[cfg(test)]
 mod test {
+    use crate::token::{AccessClaim, AccessToken};
     use chrono::Utc;
     use service_sdk::my_http_server::RequestCredentials;
-    use crate::token::{AccessToken, AccessClaim};
 
     #[test]
     fn test_encrypt_decrypt() {
@@ -133,7 +139,7 @@ mod test {
         println!("{:#?}", token);
         let creds: Box<dyn RequestCredentials> = Box::new(token.clone());
         let creds_claims = creds.get_claims().unwrap();
-        let claim_ids: Vec<String> = creds_claims.iter().map(|v| {v.id.to_string()}).collect();
+        let claim_ids: Vec<String> = creds_claims.iter().map(|v| v.id.to_string()).collect();
         println!("{:#?}", claim_ids);
 
         assert_eq!("c529bf7411fd46619b1b08ce6c17633d", token.trader_id);
@@ -150,7 +156,7 @@ mod test {
             claims: vec![AccessClaim {
                 //allowed_ips: vec!["1".to_string(), "2".to_string()],
                 expires: Utc::now().timestamp_millis(),
-                id: "Test".to_string()
+                id: "Test".to_string(),
             }],
             ..Default::default()
         };
@@ -158,7 +164,18 @@ mod test {
         let creds_claims = creds.get_claims().unwrap();
 
         assert_eq!(creds_claims.len(), token.claims.len());
-        assert_eq!(creds_claims.get(0).unwrap().id, token.claims.get(0).unwrap().id);
-        assert_eq!(creds_claims.get(0).unwrap().expires.to_chrono_utc().timestamp_millis(), token.claims.get(0).unwrap().expires);
+        assert_eq!(
+            creds_claims.get(0).unwrap().id,
+            token.claims.get(0).unwrap().id
+        );
+        assert_eq!(
+            creds_claims
+                .get(0)
+                .unwrap()
+                .expires
+                .to_chrono_utc()
+                .timestamp_millis(),
+            token.claims.get(0).unwrap().expires
+        );
     }
 }

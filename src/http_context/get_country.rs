@@ -1,9 +1,6 @@
 use service_sdk::my_http_server::{HttpContext, HttpFailResult};
 
-const COUNTRY_HEADERS: [&str; 2] = [
-    "cf-ipcountry",
-    "http_cf_ipcountry",
-];
+const COUNTRY_HEADERS: [&str; 2] = ["cf-ipcountry", "http_cf_ipcountry"];
 
 pub trait GetCountry {
     fn get_country_alpha2(&self) -> Result<String, HttpFailResult>;
@@ -20,7 +17,10 @@ impl GetCountry for HttpContext {
             }
         }
 
-        println!("Can't get_country_alpha2. Non of the header found:  {:?}", COUNTRY_HEADERS);
+        println!(
+            "Can't get_country_alpha2. Non of the header found:  {:?}",
+            COUNTRY_HEADERS
+        );
 
         return Ok("".to_string());
     }
@@ -35,7 +35,10 @@ impl GetCountry for HttpContext {
         let country = rust_iso3166::from_alpha2(&alpha2_code);
 
         let Some(country) = country else {
-            println!("Can't get_country_alpha3. Not found alpha 3 code for {:?}", alpha2_code);
+            println!(
+                "Can't get_country_alpha3. Not found alpha 3 code for {:?}",
+                alpha2_code
+            );
 
             return Ok("".to_string());
         };

@@ -1,8 +1,8 @@
-use service_sdk::rust_extensions::date_time::DateTimeAsMicroseconds;
-use serde::{Deserialize, Serialize};
-use service_sdk::my_http_server::macros::{MyHttpObjectStructure};
 use super::ApiResultStatus;
+use serde::{Deserialize, Serialize};
 use service_sdk::my_http_server;
+use service_sdk::my_http_server::macros::MyHttpObjectStructure;
+use service_sdk::rust_extensions::date_time::DateTimeAsMicroseconds;
 
 #[derive(Serialize, Deserialize, Debug, MyHttpObjectStructure)]
 pub struct OperationBlockedApiResponse {
@@ -25,7 +25,9 @@ impl OperationBlockedApiResponse {
         Self {
             result: ApiResultStatus::OperationBlocked,
             description: "Operation blocked".to_string(),
-            data: OperationBlockedApiData { expire_date: expire_date.unix_microseconds / 1000 },
+            data: OperationBlockedApiData {
+                expire_date: expire_date.unix_microseconds / 1000,
+            },
         }
     }
 }

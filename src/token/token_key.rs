@@ -8,7 +8,6 @@ impl TokenKey {
     }
 
     pub fn from_string_token(token_key: &str) -> Self {
-        
         Self {
             key: token_key.to_string(),
         }

@@ -1,5 +1,5 @@
 service_sdk::macros::use_my_no_sql_entity!();
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[my_no_sql_entity("client-sessions")]
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -40,8 +40,6 @@ impl ClientSessionNosql {
     }
 }
 
-
-
 #[my_no_sql_entity("client-sessions-lite")]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LiteClientSessionNosql {
@@ -50,7 +48,6 @@ pub struct LiteClientSessionNosql {
     #[serde(rename = "TraderId")]
     pub trader_id: String,
 }
-
 
 impl LiteClientSessionNosql {
     pub fn get_table_name() -> String {
@@ -65,4 +62,3 @@ impl LiteClientSessionNosql {
         id
     }
 }
-

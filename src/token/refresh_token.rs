@@ -13,10 +13,9 @@ pub struct RefreshToken {
 
     #[prost(string, tag = "4")]
     pub ip: String,
-    
+
     #[prost(int64, tag = "5")]
     pub expires_ts: i64,
-
 }
 
 impl RefreshToken {
@@ -38,7 +37,7 @@ impl RefreshToken {
         return match result {
             Err(_err) => None,
             Ok(data) => Some(data),
-        }
+        };
     }
 
     pub fn to_string(&self, key: &str) -> String {

@@ -1,7 +1,7 @@
-use std::fmt;
-use serde_repr::{Serialize_repr,Deserialize_repr};
+use serde_repr::{Deserialize_repr, Serialize_repr};
 use service_sdk::my_http_server;
-use service_sdk::my_http_server::macros::{MyHttpIntegerEnum};
+use service_sdk::my_http_server::macros::MyHttpIntegerEnum;
+use std::fmt;
 
 #[derive(Serialize_repr, Deserialize_repr, MyHttpIntegerEnum, Debug)]
 #[repr(i16)]

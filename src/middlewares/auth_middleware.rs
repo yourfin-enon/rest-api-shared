@@ -1,14 +1,17 @@
-use std::sync::Arc;
-use service_sdk::{my_no_sql_sdk::reader::MyNoSqlDataReader};
+use service_sdk::my_http_server::{
+    HttpContext, HttpFailResult, HttpOkResult, HttpPath, HttpServerMiddleware,
+    HttpServerRequestFlow,
+};
+use service_sdk::my_no_sql_sdk::reader::MyNoSqlDataReader;
 use service_sdk::rust_extensions::date_time::DateTimeAsMicroseconds;
-use service_sdk::my_http_server::{HttpContext, HttpFailResult, HttpOkResult, HttpPath, HttpServerMiddleware, HttpServerRequestFlow};
+use std::sync::Arc;
 
 use crate::{
-    token::{AccessToken, TokenKey},
     contracts::{
         auth_failed::AuthenticationFailedApiResponse, ApiResultStatus, ClientSessionNosql,
         LiteClientSessionNosql,
     },
+    token::{AccessToken, TokenKey},
 };
 
 const AUTH_HEADER: &str = "authorization";
@@ -145,12 +148,10 @@ impl HttpServerMiddleware for AuthMiddleware {
                     ))
                 }
             }
-            None => {
-                Err(AuthenticationFailedApiResponse::new(
-                    ApiResultStatus::AccessTokenInvalid,
-                    "AccessToken not found".to_string(),
-                ))
-            }
+            None => Err(AuthenticationFailedApiResponse::new(
+                ApiResultStatus::AccessTokenInvalid,
+                "AccessToken not found".to_string(),
+            )),
         };
     }
 }

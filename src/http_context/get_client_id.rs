@@ -1,5 +1,5 @@
-use service_sdk::my_http_server::{HttpContext, HttpFailResult};
 use crate::middlewares::KV_SESSION_ID;
+use service_sdk::my_http_server::{HttpContext, HttpFailResult};
 
 pub trait GetClientId {
     fn get_client_id(&self) -> Result<&str, HttpFailResult>;
@@ -11,9 +11,9 @@ impl GetClientId for HttpContext {
             Some(value) => {
                 return Ok(value.get_id());
             }
-            None => Err(HttpFailResult::as_unauthorized(
-                Some("User id is not found".to_string()),
-            )),
+            None => Err(HttpFailResult::as_unauthorized(Some(
+                "User id is not found".to_string(),
+            ))),
         }
     }
 }
@@ -29,8 +29,8 @@ impl GetSessionId for HttpContext {
             return Ok(result);
         }
 
-        return Err(HttpFailResult::as_unauthorized(
-            Some("Can't get session id looks like request is unauthorised"
-                .to_string()),
-        ));    }
+        return Err(HttpFailResult::as_unauthorized(Some(
+            "Can't get session id looks like request is unauthorised".to_string(),
+        )));
+    }
 }
