@@ -1,12 +1,12 @@
 [package]
 name = "rest-api-shared"
-version = "1.1.0"
+version = "1.2.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-service-sdk = { tag = "0.2.4", git = "https://github.com/MyJetTools/service-sdk.git", features = [
+service-sdk = { tag = "0.2.5", git = "https://github.com/MyJetTools/service-sdk.git", features = [
     "my-nosql-sdk",
     "macros",
     "my-nosql-data-reader-sdk",

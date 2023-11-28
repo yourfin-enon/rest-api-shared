@@ -1,4 +1,5 @@
 use service_sdk::my_http_server::{HttpContext, HttpFailResult};
+service_sdk::macros::use_my_http_server!();
 
 const COUNTRY_HEADERS: [&str; 2] = ["cf-ipcountry", "http_cf_ipcountry"];
 
@@ -10,8 +11,11 @@ pub trait GetCountry {
 impl GetCountry for HttpContext {
     fn get_country_alpha2(&self) -> Result<String, HttpFailResult> {
         for header in COUNTRY_HEADERS {
-            if let Some(header_value) = self.request.get_header(header) {
-                if let Ok(parsed_header_value) = std::str::from_utf8(header_value.as_bytes()) {
+            let headers = self.request.get_headers();
+            let header = headers.try_get_case_insensitive(header);
+
+            if let Some(header_value) = header {
+                if let Ok(parsed_header_value) = std::str::from_utf8(header_value.value) {
                     return Ok(parsed_header_value.to_owned());
                 }
             }

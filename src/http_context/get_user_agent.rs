@@ -1,4 +1,5 @@
 use service_sdk::my_http_server::{HttpContext, HttpFailResult};
+service_sdk::macros::use_my_http_server!();
 
 const HEADER: &str = "User-Agent";
 
@@ -8,8 +9,11 @@ pub trait GetUserAgent {
 
 impl GetUserAgent for HttpContext {
     fn get_user_agent(&self) -> Result<String, HttpFailResult> {
-        if let Some(header_value) = self.request.get_header(HEADER) {
-            if let Ok(parsed_header_value) = std::str::from_utf8(header_value.as_bytes()) {
+        let headers = self.request.get_headers();
+        let header = headers.try_get_case_insensitive(HEADER);
+
+        if let Some(header_value) = header {
+            if let Ok(parsed_header_value) = std::str::from_utf8(header_value.value) {
                 return Ok(parsed_header_value.to_owned());
             }
         }

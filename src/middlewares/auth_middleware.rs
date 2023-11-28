@@ -2,9 +2,10 @@ use service_sdk::my_http_server::{
     HttpContext, HttpFailResult, HttpOkResult, HttpPath, HttpServerMiddleware,
     HttpServerRequestFlow,
 };
-use service_sdk::my_no_sql_sdk::reader::MyNoSqlDataReader;
+use service_sdk::my_no_sql_sdk::reader::{MyNoSqlDataReaderTcp};
 use service_sdk::rust_extensions::date_time::DateTimeAsMicroseconds;
 use std::sync::Arc;
+service_sdk::macros::use_my_http_server!();
 
 use crate::{
     contracts::{
@@ -22,13 +23,13 @@ pub struct AuthMiddleware {
     token_key: TokenKey,
     ignore_full_paths: Option<Vec<HttpPath>>,
     ignore_start_path: Option<Vec<HttpPath>>,
-    sessions_reader: Arc<dyn MyNoSqlDataReader<LiteClientSessionNosql> + Send + Sync + 'static>,
+    sessions_reader: Arc<MyNoSqlDataReaderTcp<LiteClientSessionNosql>>,
 }
 
 impl AuthMiddleware {
     pub fn new(
         token_key: TokenKey,
-        sessions_reader: Arc<dyn MyNoSqlDataReader<LiteClientSessionNosql> + Send + Sync + 'static>,
+        sessions_reader: Arc<MyNoSqlDataReaderTcp<LiteClientSessionNosql>>,
     ) -> Self {
         Self {
             token_key,
@@ -40,7 +41,7 @@ impl AuthMiddleware {
 
     pub fn new_with_default_paths_to_ignore(
         token_key: TokenKey,
-        sessions_reader: Arc<dyn MyNoSqlDataReader<LiteClientSessionNosql> + Send + Sync + 'static>,
+        sessions_reader: Arc<MyNoSqlDataReaderTcp<LiteClientSessionNosql>>,
     ) -> Self {
         let mut result = Self::new(token_key, sessions_reader);
         result.add_start_path_to_ignore("/swagger");
@@ -104,10 +105,13 @@ impl HttpServerMiddleware for AuthMiddleware {
             return get_next.next(ctx).await;
         }
 
-        return match ctx.request.get_header(AUTH_HEADER) {
+        let headers = ctx.request.get_headers();
+        let header = headers.try_get_case_insensitive(AUTH_HEADER);
+
+        return match header {
             Some(header) => {
                 if let Some(session_token) = AccessToken::new_from_string(
-                    std::str::from_utf8(extract_token(header.as_bytes())).unwrap(),
+                    std::str::from_utf8(extract_token(header.value)).unwrap(),
                     &self.token_key.key,
                 ) {
                     let pk = ClientSessionNosql::get_partition_key(&session_token.trader_id);

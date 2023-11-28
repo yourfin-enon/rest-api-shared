@@ -1,5 +1,6 @@
 use isolang::Language;
 use service_sdk::my_http_server::{HttpContext, HttpFailResult};
+service_sdk::macros::use_my_http_server!();
 
 const LANG_HEADER: &str = "Accept-Language";
 const DEFAULT_LANG: &str = "ENG";
@@ -10,13 +11,15 @@ pub trait GetLang {
 
 impl GetLang for HttpContext {
     fn get_lang(&self) -> Result<String, HttpFailResult> {
-        if let Some(header_value) = self.request.get_header(LANG_HEADER) {
-            let lang = parse_lang(header_value);
+        let headers = self.request.get_headers();
+        let header = headers.try_get_case_insensitive(LANG_HEADER);
+
+        if let Some(header_value) = header {
+            let lang = parse_lang(std::str::from_utf8(header_value.value).unwrap());
 
             let Some(lang) = lang else {
                 println!(
-                    "Can't get LANG. Failed to parse value {}. Using default",
-                    header_value
+                    "Can't get LANG. Failed to parse value. Using default",
                 );
 
                 return Ok(DEFAULT_LANG.to_string());
