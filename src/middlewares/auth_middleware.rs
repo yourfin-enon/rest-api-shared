@@ -143,19 +143,11 @@ impl HttpServerMiddleware for AuthMiddleware {
                         .set_key_value(KV_SESSION_ID.to_string(), session_id.into_bytes());
 
                     ctx.credentials = Some(Box::new(session_token));
-
-                    get_next.next(ctx).await
-                } else {
-                    Err(AuthenticationFailedApiResponse::new(
-                        ApiResultStatus::AccessTokenInvalid,
-                        "AccessToken invalid".to_string(),
-                    ))
                 }
+
+                get_next.next(ctx).await
             }
-            None => Err(AuthenticationFailedApiResponse::new(
-                ApiResultStatus::AccessTokenInvalid,
-                "AccessToken not found".to_string(),
-            )),
+            None => get_next.next(ctx).await,
         };
     }
 }
