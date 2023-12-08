@@ -6,11 +6,11 @@ use std::fmt;
 #[derive(Serialize_repr, Deserialize_repr, MyHttpIntegerEnum, Debug)]
 #[repr(i16)]
 pub enum AccessClaimType {
-    #[http_enum_case(id="0"; description="EmailConfirmed")]
+    #[http_enum_case(id=0; description="EmailConfirmed")]
     EmailConfirmed,
-    #[http_enum_case(id="1"; description="LoginTwoFaConfirmed")]
+    #[http_enum_case(id=1; description="LoginTwoFaConfirmed")]
     LoginTwoFaConfirmed,
-    #[http_enum_case(id="2"; description="WithdrawalTwoFaConfirmed")]
+    #[http_enum_case(id=2; description="WithdrawalTwoFaConfirmed")]
     WithdrawalTwoFaConfirmed,
 }
 
