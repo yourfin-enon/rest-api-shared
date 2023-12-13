@@ -59,6 +59,9 @@ pub enum ApiResultStatus {
     #[http_enum_case(id=-21; description="Failed validation for MaxCumulativeInvestVolumeInvalid")]
     MaxCumulativeInvestVolumeInvalid = -21,
 
+    #[http_enum_case(id=-21; description="EmailNotAllowed")]
+    EmailNotAllowed = -22,
+
     #[http_enum_case(id=-999; description="Force Update required")]
     ForceUpdateIsRequired = -999,
 }
