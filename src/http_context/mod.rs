@@ -12,3 +12,5 @@ pub use get_country::*;
 pub use get_ip::*;
 pub use get_lang::*;
 pub use get_user_agent::*;
+pub use kyc_confirmed::*;
+
