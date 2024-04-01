@@ -4,6 +4,7 @@ mod get_country;
 mod get_ip;
 mod get_lang;
 mod get_user_agent;
+mod kyc_confirmed;
 
 pub use get_brand_id::*;
 pub use get_client_id::*;

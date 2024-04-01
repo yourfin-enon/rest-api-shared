@@ -14,10 +14,12 @@ use crate::{
     },
     token::{AccessToken, TokenKey},
 };
+use crate::token::access_claim::AccessClaimType;
 
 const AUTH_HEADER: &str = "authorization";
 pub const KV_BRAND_ID: &str = "BRAND_ID";
 pub const KV_SESSION_ID: &str = "SESSION_ID";
+pub const KV_KYC_ID: &str = "KV_KYC_ID";
 
 pub struct AuthMiddleware {
     token_key: TokenKey,
@@ -141,7 +143,14 @@ impl HttpServerMiddleware for AuthMiddleware {
                     let session_id = session_token.get_session_id().to_owned();
                     ctx.request
                         .set_key_value(KV_SESSION_ID.to_string(), session_id.into_bytes());
-
+                    
+                    let kyc_claim = session_token.get_claims().iter().find(|c| c.id == AccessClaimType::WithdrawalKycConfirmed.to_string());
+                    
+                    if let Some(kyc_claim) = kyc_claim {
+                        ctx.request
+                            .set_key_value(KV_KYC_ID.to_string(), kyc_claim.id.clone().into_bytes());
+                    }
+                    
                     ctx.credentials = Some(Box::new(session_token));
                 }
 

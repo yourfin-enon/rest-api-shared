@@ -87,6 +87,11 @@ impl AccessToken {
         &self.session_id
     }
 
+    pub fn get_claims(&self) -> &Vec<AccessClaim> {
+        &self.claims
+    }
+
+
     pub fn get_expires_microseconds(&self) -> i64 {
         let expires = Utc.timestamp_millis_opt(self.expires_ts).single();
 
