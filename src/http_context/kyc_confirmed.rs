@@ -1,4 +1,4 @@
-use crate::middlewares::{KV_BRAND_ID, KV_KYC_ID, KV_SESSION_ID};
+use crate::middlewares::{KV_KYC_ID};
 use service_sdk::my_http_server::{HttpContext, HttpFailResult};
 
 pub trait KycConfirmed {
