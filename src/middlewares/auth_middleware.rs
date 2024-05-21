@@ -25,13 +25,13 @@ pub struct AuthMiddleware {
     token_key: TokenKey,
     ignore_full_paths: Option<Vec<HttpPath>>,
     ignore_start_path: Option<Vec<HttpPath>>,
-    sessions_reader: Arc<MyNoSqlDataReaderTcp<LiteClientSessionNosql>>,
+    sessions_reader: Option<Arc<MyNoSqlDataReaderTcp<LiteClientSessionNosql>>>,
 }
 
 impl AuthMiddleware {
     pub fn new(
         token_key: TokenKey,
-        sessions_reader: Arc<MyNoSqlDataReaderTcp<LiteClientSessionNosql>>,
+        sessions_reader: Option<Arc<MyNoSqlDataReaderTcp<LiteClientSessionNosql>>>,
     ) -> Self {
         Self {
             token_key,
@@ -43,7 +43,7 @@ impl AuthMiddleware {
 
     pub fn new_with_default_paths_to_ignore(
         token_key: TokenKey,
-        sessions_reader: Arc<MyNoSqlDataReaderTcp<LiteClientSessionNosql>>,
+        sessions_reader: Option<Arc<MyNoSqlDataReaderTcp<LiteClientSessionNosql>>>,
     ) -> Self {
         let mut result = Self::new(token_key, sessions_reader);
         result.add_start_path_to_ignore("/swagger");
@@ -118,14 +118,16 @@ impl HttpServerMiddleware for AuthMiddleware {
                 ) {
                     let pk = ClientSessionNosql::get_partition_key(&session_token.trader_id);
                     let rk = ClientSessionNosql::get_row_key(&session_token.session_id);
-                    let session = self.sessions_reader.get_entity(pk, &rk).await;
+                    if let Some(sessions_reader) = self.sessions_reader.as_ref() {
+                        let session = sessions_reader.get_entity(pk, &rk).await;
 
-                    if session.is_none() {
-                        return Err(AuthenticationFailedApiResponse::new(
-                            ApiResultStatus::AccessTokenInvalid,
-                            "Session not found".to_string(),
-                        ));
-                    }
+                        if session.is_none() {
+                            return Err(AuthenticationFailedApiResponse::new(
+                                ApiResultStatus::AccessTokenInvalid,
+                                "Session not found".to_string(),
+                            ));
+                        }
+                    }                    
 
                     let now = DateTimeAsMicroseconds::now();
 
